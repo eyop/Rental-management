@@ -1,43 +1,571 @@
-import 'dart:io';
+// import 'dart:io';
 
-import 'package:firebase_storage/firebase_storage.dart';
+// import 'package:flutter/material.dart';
+// import 'package:image_picker/image_picker.dart';
+// import 'package:firebase_core/firebase_core.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:provider/provider.dart';
+// import 'package:rental_management/providers/authentication_provider.dart';
+
+// import '../models/property_model.dart';
+
+// class PropertyPost extends StatefulWidget {
+//   static const String routeName = '/property-post';
+
+//   const PropertyPost({Key? key}) : super(key: key);
+
+//   @override
+//   State<PropertyPost> createState() => _PropertyPostState();
+// }
+
+// class _PropertyPostState extends State<PropertyPost> {
+//   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+//   final GlobalKey<FormState> _formKey = GlobalKey();
+//   List<Map<String, dynamic>> propertyTypes = [
+//     {"name": "Apartment", "icon": Icons.apartment},
+//     {"name": "Flat", "icon": Icons.home},
+//     {"name": "Plot/Land", "icon": Icons.landscape},
+//     {"name": "Vehicle", "icon": Icons.directions_car},
+//     {"name": "Other", "icon": Icons.category}, // Example for other types
+//   ];
+
+//   String _subcity = "";
+//   String _city = "";
+//   String _region = "";
+//   String _description = "";
+//   String _contact = "";
+//   double _price = 0.0;
+
+//   int selected = 0;
+//   final List<String> _imageFilesList = [];
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       key: _scaffoldKey,
+//       backgroundColor: Colors.grey[100],
+//       appBar: AppBar(
+//         titleSpacing: 0,
+//         title: const Text("Rent Property"),
+//       ),
+//       body: Column(
+//         children: <Widget>[
+//           Expanded(
+//             child: Form(
+//               key: _formKey,
+//               child: ListView(
+//                 children: <Widget>[
+//                   Column(
+//                     mainAxisSize: MainAxisSize.min,
+//                     mainAxisAlignment: MainAxisAlignment.start,
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: <Widget>[
+//                       _buildLabel("PROPERTY TYPE"),
+//                       _buildPropertyTypesWidget(),
+//                       _buildLabel("PROPERTY PHOTOS"),
+//                       _buildPropertyPhotosWidget(),
+//                       _buildLabel("PROPERTY ADDRESS"),
+//                       _buildPropertyLocationWidget(),
+//                       _buildLabel("PRICE"),
+//                       _buildPriceWidget(),
+//                       _buildLabel("CONTACT DETAILS"),
+//                       _buildContactDetailsWidget(),
+//                       _buildLabel("OTHER DETAILS"),
+//                       _buildDescription(),
+//                     ],
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ),
+//           _buildSubmitPostWidget(),
+//         ],
+//       ),
+//     );
+//   }
+
+//   Widget _buildContactDetailsWidget() {
+//     return Container(
+//       color: Colors.white,
+//       padding: const EdgeInsets.symmetric(vertical: 10.0),
+//       margin: const EdgeInsets.only(top: 10.0),
+//       child: Padding(
+//         padding: const EdgeInsets.symmetric(horizontal: 20.0),
+//         child: TextFormField(
+//           validator: (String? value) {
+//             if (value == null || value.isEmpty) {
+//               return "Contact field is required!!";
+//             }
+//             return null;
+//           },
+//           onSaved: (String? value) {
+//             _contact = value!;
+//           },
+//           keyboardType: TextInputType.number,
+//           maxLength: 10,
+//           style: const TextStyle(color: Colors.black),
+//           decoration: const InputDecoration(
+//             counterText: "",
+//             labelText: "Contact",
+//             labelStyle: TextStyle(color: Colors.grey),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   Widget _buildDescription() {
+//     return Container(
+//       color: Colors.white,
+//       padding: const EdgeInsets.symmetric(vertical: 10.0),
+//       margin: const EdgeInsets.only(top: 10.0),
+//       child: Padding(
+//         padding: const EdgeInsets.symmetric(horizontal: 20.0),
+//         child: TextFormField(
+//           validator: (value) {
+//             if (value == null || value.isEmpty) {
+//               return "Description is required!";
+//             }
+//             return null;
+//           },
+//           onChanged: (value) {
+//             _description = value;
+//           },
+//           style: const TextStyle(color: Colors.black),
+//           decoration: const InputDecoration(
+//             labelText: "Additional Property Description",
+//             labelStyle: TextStyle(color: Colors.grey),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   Widget _buildLabel(String label) {
+//     return Padding(
+//       padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 20.0),
+//       child: Text(
+//         label,
+//         style: TextStyle(
+//           color: Colors.black,
+//           fontSize: 16.0,
+//           fontWeight: FontWeight.bold,
+//         ),
+//         textAlign: TextAlign.start,
+//       ),
+//     );
+//   }
+
+//   Widget _buildPriceWidget() {
+//     return Container(
+//       color: Colors.white,
+//       padding: const EdgeInsets.symmetric(vertical: 10.0),
+//       margin: const EdgeInsets.only(top: 10.0),
+//       child: Padding(
+//         padding: const EdgeInsets.symmetric(horizontal: 20.0),
+//         child: TextFormField(
+//           validator: (String? price) {
+//             if (price == null || price.isEmpty) {
+//               return "Price field is required!!";
+//             }
+//             return null;
+//           },
+//           onSaved: (value) {
+//             _price = double.tryParse(value!)!;
+//           },
+//           keyboardType: TextInputType.number,
+//           style: const TextStyle(color: Colors.black),
+//           decoration: const InputDecoration(
+//             labelText: "Price",
+//             labelStyle: TextStyle(color: Colors.grey),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   Widget _buildPropertyLocationWidget() {
+//     return Container(
+//       color: Colors.white,
+//       padding: const EdgeInsets.symmetric(vertical: 10.0),
+//       margin: const EdgeInsets.only(top: 10.0),
+//       child: Column(
+//         children: <Widget>[
+//           Padding(
+//             padding:
+//                 const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+//             child: TextFormField(
+//               style: const TextStyle(color: Colors.black),
+//               decoration: const InputDecoration(
+//                 labelText: "Region (Optional)",
+//                 labelStyle: TextStyle(color: Colors.grey),
+//               ),
+//               onSaved: (value) {
+//                 _region = value!;
+//               },
+//             ),
+//           ),
+//           Padding(
+//             padding:
+//                 const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+//             child: TextFormField(
+//               style: const TextStyle(color: Colors.black),
+//               decoration: const InputDecoration(
+//                 labelText: "City",
+//                 labelStyle: TextStyle(color: Colors.grey),
+//               ),
+//               validator: (value) {
+//                 if (value == null || value.isEmpty) {
+//                   return "City field is required!";
+//                 }
+//                 return null;
+//               },
+//               onSaved: (value) {
+//                 _city = value!;
+//               },
+//             ),
+//           ),
+//           Padding(
+//             padding:
+//                 const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+//             child: TextFormField(
+//               validator: (String? value) {
+//                 if (value?.isEmpty ?? false) {
+//                   return "Sub-city field is required!!";
+//                 }
+//                 return null;
+//               },
+//               onSaved: (value) {
+//                 _subcity = value!;
+//               },
+//               style: const TextStyle(color: Colors.black),
+//               decoration: const InputDecoration(
+//                 labelText: "Sub City",
+//                 labelStyle: TextStyle(color: Colors.grey),
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   Widget _buildPropertyPhotosWidget() {
+//     return Container(
+//       color: Colors.white,
+//       height: 120.0,
+//       padding: const EdgeInsets.symmetric(vertical: 10.0),
+//       margin: const EdgeInsets.only(top: 10.0),
+//       child: ListView.builder(
+//         scrollDirection: Axis.horizontal,
+//         itemCount: _imageFilesList.length + 1,
+//         itemBuilder: (context, index) {
+//           if (index == 0) {
+//             return GestureDetector(
+//               onTap: () {
+//                 _pickImage();
+//               },
+//               child: Container(
+//                 margin: const EdgeInsets.only(left: 20.0, right: 10.0),
+//                 width: 100.0,
+//                 height: 100.0,
+//                 decoration: BoxDecoration(
+//                   color: Colors.grey[300],
+//                   borderRadius: BorderRadius.circular(10.0),
+//                 ),
+//                 child: const Icon(
+//                   Icons.add_a_photo,
+//                   color: Colors.grey,
+//                   size: 50.0,
+//                 ),
+//               ),
+//             );
+//           } else {
+//             return Container(
+//               margin: const EdgeInsets.only(left: 20.0, right: 10.0),
+//               width: 100.0,
+//               height: 100.0,
+//               decoration: BoxDecoration(
+//                 borderRadius: BorderRadius.circular(10.0),
+//                 image: DecorationImage(
+//                   image: FileImage(File(_imageFilesList[index - 1])),
+//                   fit: BoxFit.cover,
+//                 ),
+//               ),
+//               child: Align(
+//                 alignment: Alignment.topRight,
+//                 child: GestureDetector(
+//                   onTap: () {
+//                     _removeImage(index - 1);
+//                   },
+//                   child: Container(
+//                     margin: const EdgeInsets.all(5.0),
+//                     padding: const EdgeInsets.all(3.0),
+//                     decoration: BoxDecoration(
+//                       color: Colors.red,
+//                       shape: BoxShape.circle,
+//                     ),
+//                     child: const Icon(
+//                       Icons.close,
+//                       color: Colors.white,
+//                       size: 15.0,
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//             );
+//           }
+//         },
+//       ),
+//     );
+//   }
+
+//   void _removeImage(int index) {
+//     setState(() {
+//       _imageFilesList.removeAt(index);
+//     });
+//   }
+
+//   Future<void> _pickImage() async {
+//     final picker = ImagePicker();
+//     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+//     if (pickedFile != null) {
+//       setState(() {
+//         _imageFilesList.add(pickedFile.path);
+//       });
+//     }
+//   }
+
+//   Widget _buildPropertyTypesWidget() {
+//     return Container(
+//       color: Colors.white,
+//       height: 80.0,
+//       padding: const EdgeInsets.symmetric(vertical: 10.0),
+//       margin: const EdgeInsets.only(top: 10.0),
+//       child: ListView.builder(
+//         scrollDirection: Axis.horizontal,
+//         itemCount: propertyTypes.length,
+//         itemBuilder: (BuildContext context, int index) {
+//           final isSelected = selected == index;
+//           return GestureDetector(
+//             onTap: () {
+//               setState(() {
+//                 selected = index;
+//               });
+//             },
+//             child: Container(
+//               width: 120.0,
+//               margin: const EdgeInsets.only(left: 20.0, right: 10.0),
+//               decoration: BoxDecoration(
+//                 color: isSelected ? Colors.blue : Colors.grey[300],
+//                 borderRadius: BorderRadius.circular(10.0),
+//               ),
+//               alignment: Alignment.center,
+//               child: Column(
+//                 mainAxisAlignment: MainAxisAlignment.center,
+//                 children: [
+//                   Icon(
+//                     propertyTypes[index]['icon'],
+//                     size: 30.0,
+//                     color: isSelected ? Colors.white : Colors.black,
+//                   ),
+//                   const SizedBox(height: 5.0),
+//                   Text(
+//                     propertyTypes[index]['name'],
+//                     style: TextStyle(
+//                       color: isSelected ? Colors.white : Colors.black,
+//                       fontWeight: FontWeight.bold,
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           );
+//         },
+//       ),
+//     );
+//   }
+
+//   Widget _buildSubmitPostWidget() {
+//     final uid = context.read<AuthenticationProvider>().uid;
+//     return Container(
+//       width: double.infinity,
+//       color: Colors.white,
+//       padding: const EdgeInsets.all(20.0),
+//       child: ElevatedButton(
+//         onPressed: () {
+//           _submitPost(uid);
+//         },
+//         child: const Text(
+//           "Post Property",
+//           style: TextStyle(fontSize: 16.0),
+//         ),
+//       ),
+//     );
+//   }
+
+// void _submitPost(String? uid) async {
+//   final form = _formKey.currentState;
+//   if (form != null && form.validate()) {
+//     form.save();
+
+//     PropertyModel property = PropertyModel(
+//       id: uid,
+//       propertyType: propertyTypes[selected + 1]['name'],
+//       images: _imageFilesList,
+//       region: _region,
+//       city: _city,
+//       subcity: _subcity,
+//       price: _price.toString(),
+//       contact: _contact,
+//       description: _description,
+//     );
+//     print("///////////////////////////////////");
+//     print("Property Type: ${propertyTypes[selected + 1]['name']}");
+//     print("Property Photos: $_imageFilesList");
+//     print("Region: $_region, City: $_city, Sub-city: $_subcity");
+//     print("Price: $_price");
+//     print("Contact: $_contact");
+//     print("Description: $_description");
+
+//     try {
+//       final firestore = FirebaseFirestore.instance;
+
+//       await firestore.collection('properties').add(property.toMap());
+
+//       form.reset();
+//       setState(() {
+//         selected = 0;
+//         _imageFilesList.clear();
+//       });
+
+//       _showSuccessAnimation();
+//     } catch (e) {
+//       _showErrorAnimation(e);
+//     }
+//   }
+// }
+
+// void _showSuccessAnimation() {
+//   ScaffoldMessenger.of(context).showSnackBar(
+//     const SnackBar(
+//       content: Text('Property posted successfully!'),
+//     ),
+//   );
+// }
+//   void _showSuccessAnimation() {
+//     showDialog(
+//       context: context,
+//       builder: (BuildContext context) {
+//         return Center(
+//           child: Material(
+//             type: MaterialType.transparency,
+//             child: ScaleTransition(
+//               scale: CurvedAnimation(
+//                 parent: ModalRoute.of(context)!.animation!,
+//                 curve: Curves.easeOutBack,
+//                 reverseCurve: Curves.easeInBack,
+//               ),
+//               child: Container(
+//                 padding: EdgeInsets.all(20.0),
+//                 decoration: BoxDecoration(
+//                   color: Colors.white,
+//                   borderRadius: BorderRadius.circular(10.0),
+//                   boxShadow: [
+//                     BoxShadow(
+//                       color: Colors.grey.withOpacity(0.5),
+//                       spreadRadius: 3,
+//                       blurRadius: 7,
+//                       offset: Offset(0, 3), // changes position of shadow
+//                     ),
+//                   ],
+//                 ),
+//                 child: Column(
+//                   mainAxisSize: MainAxisSize.min,
+//                   children: [
+//                     Icon(
+//                       Icons.check_circle,
+//                       color: Colors.green,
+//                       size: 60.0,
+//                     ),
+//                     SizedBox(height: 20.0),
+//                     Text(
+//                       'Property posted successfully!',
+//                       style: TextStyle(fontSize: 18.0),
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//           ),
+//         );
+//       },
+//     );
+//   }
+
+//   void _showErrorAnimation(Object e) {
+//     showDialog(
+//       context: context,
+//       builder: (BuildContext context) {
+//         return AlertDialog(
+//           title: const Text('Error'),
+//           content: const Text('Failed to post property. Please try again.  '),
+//           actions: <Widget>[
+//             TextButton(
+//               onPressed: () {
+//                 Navigator.of(context).pop();
+//               },
+//               child: const Text('OK'),
+//             ),
+//           ],
+//         );
+//       },
+//     );
+//   }
+// }
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:rental_management/models/dummy_data.dart';
-
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:intl/intl.dart';
+import 'package:path/path.dart' as Path;
+import 'package:provider/provider.dart';
+import 'package:rental_management/providers/authentication_provider.dart';
+import 'package:rental_management/screens/property_listing.dart';
 import '../models/property_model.dart';
-import '../utils/colors.dart';
-import '../utils/method_utils.dart';
 
 class PropertyPost extends StatefulWidget {
   static const String routeName = '/property-post';
-  const PropertyPost({super.key});
+
+  const PropertyPost({Key? key}) : super(key: key);
 
   @override
   State<PropertyPost> createState() => _PropertyPostState();
 }
 
 class _PropertyPostState extends State<PropertyPost> {
-  PropertyModel rentModel = PropertyModel();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   final GlobalKey<FormState> _formKey = GlobalKey();
+  List<Map<String, dynamic>> propertyTypes = [
+    {"name": "Apartment", "icon": Icons.apartment},
+    {"name": "Flat", "icon": Icons.home},
+    {"name": "Plot/Land", "icon": Icons.landscape},
+    {"name": "Vehicle", "icon": Icons.directions_car},
+    {"name": "Other", "icon": Icons.category}, // Example for other types
+  ];
 
-  String _subcity = "",
-      _city = "",
-      _region = "",
-      _description = "",
-      _contact = "";
+  String _subcity = "";
+  String _city = "";
+  String _region = "";
+  String _description = "";
+  String _contact = "";
   double _price = 0.0;
 
   int selected = 0;
   final List<String> _imageFilesList = [];
-  var isUploadingPost = false;
-  var isEditInitialized = true;
-
-  final List<TextEditingController> _detailControllers = [];
-  //final Map<int, String> _detailTextValues = {};
-  final Map<String, String> _detailTextValues = {};
-  final List<Map<String, TextEditingController>> _dynamicFields = [];
 
   @override
   Widget build(BuildContext context) {
@@ -53,51 +581,28 @@ class _PropertyPostState extends State<PropertyPost> {
           Expanded(
             child: Form(
               key: _formKey,
-              child: Expanded(
-                child: ListView(
-                  children: [
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        _buildLabel("PROPERTY TYPE"),
-                        _buildPropertyTypesWidget(),
-                        _buildLabel("PROPERTY PHOTOS"),
-                        _buildPropertyPhotosWidget(),
-                        _buildLabel("PROPERTY ADDRESS"),
-                        _buildPropertyLocationWidget(),
-                        _buildLabel("PRICE"),
-                        _buildPriceWidget(),
-                        //_buildLabel("PROPERTY DETAILS"),
-                        //_buildPropertyDetailsWidget(),
-                        _buildLabel("CONTACT DETAILS"),
-                        _buildContactDetailsWidget(),
-                        _buildLabel("OTHER DETAILS"),
-                        _buildDescription(),
-                        _buildLabel("OTHER DETAILS"),
-                      ],
-                    ),
-                    SizedBox(height: 300, child: _buildOtherDetails()),
-                    GestureDetector(
-                      onTap: () {
-                        _addNewTextField();
-                      },
-                      child: const SizedBox(
-                        width: double.infinity,
-                        height: 30,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                          ),
-                          child: Center(
-                            child: Text("Add New Field"),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
+              child: ListView(
+                children: <Widget>[
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      _buildLabel("PROPERTY TYPE"),
+                      _buildPropertyTypesWidget(),
+                      _buildLabel("PROPERTY PHOTOS"),
+                      _buildPropertyPhotosWidget(),
+                      _buildLabel("PROPERTY ADDRESS"),
+                      _buildPropertyLocationWidget(),
+                      _buildLabel("PRICE"),
+                      _buildPriceWidget(),
+                      _buildLabel("CONTACT DETAILS"),
+                      _buildContactDetailsWidget(),
+                      _buildLabel("OTHER DETAILS"),
+                      _buildDescription(),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
@@ -105,62 +610,6 @@ class _PropertyPostState extends State<PropertyPost> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    for (var field in _dynamicFields) {
-      field['key']!.dispose();
-      field['value']!.dispose();
-    }
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  Future<List<String>> uploadImage(List<String> imageFiles) async {
-    List<String> filePaths = [];
-
-    print("filePaths : $filePaths");
-    for (int i = 0; i < imageFiles.length; i++) {
-      if (checkForFileOrNetworkPath(imageFiles[i])) {
-        filePaths.add(imageFiles[i]);
-        continue;
-      }
-      final firebaseStorageRef = FirebaseStorage.instance
-          .ref()
-          .child("images/sell/${DateTime.now().toIso8601String()}");
-
-      final uploadTask = firebaseStorageRef.putFile(File(imageFiles[i]));
-      //
-      final taskSnapshot = await uploadTask.whenComplete(() => null);
-      String storagePath = await taskSnapshot.ref.getDownloadURL();
-      filePaths.add(storagePath);
-    }
-
-    print("filePaths : $filePaths");
-    return filePaths;
-  }
-
-  void _addNewTextField() {
-    final keyController = TextEditingController();
-    final valueController = TextEditingController();
-    setState(() {
-      _dynamicFields.add({
-        'key': keyController,
-        'value': valueController,
-      });
-    });
-
-    valueController.addListener(() {
-      final key = keyController.text;
-      if (key.isNotEmpty) {
-        _detailTextValues[key] = valueController.text;
-      }
-    });
   }
 
   Widget _buildContactDetailsWidget() {
@@ -203,9 +652,12 @@ class _PropertyPostState extends State<PropertyPost> {
         child: TextFormField(
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return "description is required!";
+              return "Description is required!";
             }
             return null;
+          },
+          onChanged: (value) {
+            _description = value;
           },
           style: const TextStyle(color: Colors.black),
           decoration: const InputDecoration(
@@ -222,66 +674,12 @@ class _PropertyPostState extends State<PropertyPost> {
       padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 20.0),
       child: Text(
         label,
-        style: TextStyle(color: textLabelColor, fontSize: 11.0),
-        textAlign: TextAlign.start,
-      ),
-    );
-  }
-
-  Widget _buildOtherDetails() {
-    return Expanded(
-      child: ListView.builder(
-        itemCount: _dynamicFields.length,
-        itemBuilder: (context, index) => Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _dynamicFields[index]['key']!,
-                decoration: InputDecoration(
-                  labelText: "Detail Title ${index + 1}",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "please enter text";
-                  }
-                  return null;
-                },
-                onSaved: (input) {
-                  if (input!.isNotEmpty) {
-                    _detailTextValues[input] =
-                        _dynamicFields[index]['value']!.text;
-                  }
-                },
-              ),
-              const SizedBox(height: 4),
-              TextFormField(
-                controller: _dynamicFields[index]['value']!,
-                decoration: InputDecoration(
-                  labelText: "Detail Field ${index + 1}",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "please enter text";
-                  }
-                  return null;
-                },
-                onSaved: (input) {
-                  final key = _dynamicFields[index]['key']!.text;
-                  if (key.isNotEmpty) {
-                    _detailTextValues[key] = input!;
-                  }
-                },
-              ),
-            ],
-          ),
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 16.0,
+          fontWeight: FontWeight.bold,
         ),
+        textAlign: TextAlign.start,
       ),
     );
   }
@@ -350,6 +748,9 @@ class _PropertyPostState extends State<PropertyPost> {
                 }
                 return null;
               },
+              onSaved: (value) {
+                _city = value!;
+              },
             ),
           ),
           Padding(
@@ -358,7 +759,7 @@ class _PropertyPostState extends State<PropertyPost> {
             child: TextFormField(
               validator: (String? value) {
                 if (value?.isEmpty ?? false) {
-                  return "sub-city field is required!!";
+                  return "Sub-city field is required!!";
                 }
                 return null;
               },
@@ -383,409 +784,336 @@ class _PropertyPostState extends State<PropertyPost> {
       height: 120.0,
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       margin: const EdgeInsets.only(top: 10.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(left: 15.0, right: 10.0),
-            child: Column(
-              children: <Widget>[
-                IconButton(
-                  onPressed: () {
-                    _openImagePicker(context);
-                  },
-                  icon: const Icon(Icons.camera_enhance),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: _imageFilesList.length + 1,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return GestureDetector(
+              onTap: () {
+                _pickImage();
+              },
+              child: Container(
+                margin: const EdgeInsets.only(left: 20.0, right: 10.0),
+                width: 100.0,
+                height: 100.0,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: const Icon(
+                  Icons.add_a_photo,
                   color: Colors.grey,
-                  iconSize: 65.0,
+                  size: 50.0,
                 ),
-                const Text(
-                  "Add Photos",
-                  style: TextStyle(fontSize: 13.0),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Container(
-              child: ListView.builder(
-                itemCount: _imageFilesList.length,
-                padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-                shrinkWrap: true,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (BuildContext context, int index) {
-                  return Center(
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 10.0),
-                      height: 80.0,
-                      width: 80.0,
-                      child: Stack(
-                        children: <Widget>[
-                          ClipOval(
-                            child: _imageFilesList[index].isNotEmpty
-                                ? checkForFileOrNetworkPath(
-                                        _imageFilesList[index])
-                                    ? fetchImageWithPlaceHolderWithDims(
-                                        80.0, 80.0, _imageFilesList[index])
-                                    
-                                    : Image.file(
-                                        File(_imageFilesList[index]),
-                                        fit: BoxFit.cover,
-                                        height: 80.0,
-                                        width: 80.0,
-                                      )
-                                : Image.asset(
-                                    "assets/images/transparent_placeholder.png",
-                                    fit: BoxFit.cover,
-                                    height: 80.0,
-                                    width: 80.0,
-                                  ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _imageFilesList.removeAt(index);
-                              });
-                            },
-                            child: Container(
-                              alignment: Alignment.topRight,
-                              child: Image.asset(
-                                "assets/images/cancel.png",
-                                fit: BoxFit.fitHeight,
-                                height: 20.0,
-                                width: 20.0,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
               ),
-            ),
-          ),
-        ],
+            );
+          } else {
+            return Container(
+              margin: const EdgeInsets.only(left: 20.0, right: 10.0),
+              width: 100.0,
+              height: 100.0,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0),
+                image: DecorationImage(
+                  image: FileImage(File(_imageFilesList[index - 1])),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: Align(
+                alignment: Alignment.topRight,
+                child: GestureDetector(
+                  onTap: () {
+                    _removeImage(index - 1);
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.all(5.0),
+                    padding: const EdgeInsets.all(3.0),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 15.0,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+        },
       ),
     );
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      _imageFilesList.removeAt(index);
+    });
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFilesList.add(pickedFile.path);
+      });
+    }
   }
 
   Widget _buildPropertyTypesWidget() {
     return Container(
       color: Colors.white,
+      height: 80.0,
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       margin: const EdgeInsets.only(top: 10.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          InkWell(
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: propertyTypes.length,
+        itemBuilder: (BuildContext context, int index) {
+          final isSelected = selected == index;
+          return GestureDetector(
             onTap: () {
               setState(() {
-                selected = selected == 1 ? 0 : 1;
+                selected = index;
               });
             },
-            child: Column(
-              children: <Widget>[
-                Icon(
-                  Icons.business,
-                  size: 70,
-                  color: selected == 1 ? Colors.red : unselectedIconColor,
-                ),
-                const Text(
-                  "Apartment",
-                  style: TextStyle(fontSize: 13.0),
-                ),
-              ],
+            child: Container(
+              width: 120.0,
+              margin: const EdgeInsets.only(left: 20.0, right: 10.0),
+              decoration: BoxDecoration(
+                color: isSelected ? Colors.blue : Colors.grey[300],
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    propertyTypes[index]['icon'],
+                    size: 30.0,
+                    color: isSelected ? Colors.white : Colors.black,
+                  ),
+                  const SizedBox(height: 5.0),
+                  Text(
+                    propertyTypes[index]['name'],
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          InkWell(
-            onTap: () {
-              setState(() {
-                selected = selected == 2 ? 0 : 2;
-              });
-            },
-            child: Column(
-              children: <Widget>[
-                Icon(
-                  Icons.home,
-                  size: 70,
-                  color: selected == 2 ? Colors.green : unselectedIconColor,
-                ),
-                const Text(
-                  "Flat",
-                  style: TextStyle(fontSize: 13.0),
-                ),
-              ],
-            ),
-          ),
-          InkWell(
-            onTap: () {
-              setState(() {
-                selected = selected == 3 ? 0 : 3;
-              });
-            },
-            child: Column(
-              children: <Widget>[
-                Icon(
-                  Icons.landscape,
-                  size: 70,
-                  color: selected == 3 ? Colors.blue : unselectedIconColor,
-                ),
-                const Text(
-                  "Plot/Land",
-                  style: TextStyle(fontSize: 13.0),
-                ),
-              ],
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
   Widget _buildSubmitPostWidget() {
-    return GestureDetector(
-      onTap: () {
-        _submitPropertySellPost();
-      },
-      child: Container(
-        color: Theme.of(context).primaryColor,
-        padding: const EdgeInsets.only(top: 10.0),
-        margin: const EdgeInsets.only(top: 10.0),
-        width: double.infinity,
-        height: 50.0,
-        child: Center(
-          child: Text(
-            isUploadingPost ? "Uploading..." : "Submit Post",
-            style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18.0,
-                letterSpacing: 2.0),
-          ),
+    final uid = context.read<AuthenticationProvider>().uid;
+    return Container(
+      width: double.infinity,
+      color: Colors.white,
+      padding: const EdgeInsets.all(20.0),
+      child: ElevatedButton(
+        onPressed: () {
+          _submitPost(uid);
+        },
+        child: const Text(
+          "Post Property",
+          style: TextStyle(fontSize: 16.0),
         ),
       ),
     );
   }
 
-  _getImage(BuildContext context, ImageSource source) async {
-    ImagePicker()
-        .pickImage(
-      source: source,
-      maxWidth: 400.0,
-      maxHeight: 400.0,
-    )
-        .then((XFile? image) async {
-      if (image != null) {
-        setState(() {
-          _imageFilesList.add(image.path);
-          print("_imageFile : $image");
-          print("filePath : ${image.path}");
-          //print("fileURI : ${image}");
-          /*String filePath = image.path;
-          Uri fileURI = image.uri;*/
-        });
-      }
-    });
-  }
+  void _submitPost(String? uid) async {
+    final form = _formKey.currentState;
+    if (form != null && form.validate()) {
+      form.save();
 
-  void _openImagePicker(BuildContext context) {
-    showModalBottomSheet(
+      // Show loading indicator
+      showDialog(
         context: context,
+        barrierDismissible: false, // Prevent dismissing while uploading
         builder: (BuildContext context) {
-          return Container(
-            height: 160.0,
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              children: <Widget>[
-                Center(
-                  child: Text(
-                    "Select Image",
-                    style: TextStyle(
-                      fontSize: 25.0,
-                      fontWeight: FontWeight.bold,
-                      color: themeColor,
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 10.0,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    _getImage(context, ImageSource.camera);
-                    Navigator.of(context).pop();
-                  },
-                  child: Row(
-                    children: <Widget>[
-                      Icon(
-                        Icons.photo_camera,
-                        size: 30.0,
-                        color: themeColor,
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 10.0,
-                        ),
-                      ),
-                      Text(
-                        "Use Camera",
-                        style: TextStyle(
-                          fontSize: 15.0,
-                          color: themeColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 10.0,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    _getImage(context, ImageSource.gallery);
-                    Navigator.of(context).pop();
-                  },
-                  child: Row(
-                    children: <Widget>[
-                      Icon(
-                        Icons.camera,
-                        size: 30.0,
-                        color: themeColor,
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 10.0,
-                        ),
-                      ),
-                      Text(
-                        "Use Gallery",
-                        style: TextStyle(
-                          fontSize: 15.0,
-                          color: themeColor,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          return const Center(
+            child: CircularProgressIndicator(), // Or your custom loading widget
           );
-        });
-  }
+        },
+      );
 
-  _submitPropertySellPost() async {
-    setState(() {
-      isUploadingPost = true;
-    });
-    if (selected == 0) {
-      const snackBar = SnackBar(content: Text("Select property type!!"));
+      try {
+        // Upload images to Firebase Storage and get download URLs
+        List<String> imageUrls = await _uploadImages();
 
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      return;
-    }
-
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    _formKey.currentState!.save();
-
-    try {
-      List<String> imagePaths = [];
-      // try {
-      //   if (_imageFilesList.isNotEmpty) {
-      //     imagePaths = await uploadImage(_imageFilesList);
-      //     print("imagePaths : $imagePaths");
-      //     print("imagePaths : ${imagePaths.length}");
-      //   }
-      // } catch (error) {
-      //   print("uploadError : ${error.toString()}");
-      // }
-
-      // final propertySellReference =
-      //     FirebaseStorage.instance.ref().child("Property").child("Sell");
-
-      print("_imageFilesList : ${_imageFilesList.length}");
-      print("imagePaths : ${imagePaths.length}");
-
-      // TODO: These lines below are for firebase posting.
-      // String resourceID = propertySellReference.push().key ?? "";
-
-      // if (rentModel == null || widget.rentModel.id == null) {
-      //   await propertySellReference.child(resourceID).set({
-      //     "id": resourceID,
-      //     "sellType": selected,
-      //     "images": imagePaths.isNotEmpty ? imagePaths : "",
-      //     "sellAddress": addressController.text,
-      //     "sellCity": cityController.text,
-      //     "sellRegion": regionController.text,
-      //     "sellCountry": countryController.text,
-      //     "sellPrice": priceController.text,
-      //     "sellBathrooms": bathroomController.text,
-      //     "bedrooms": bedroomController.text,
-      //     "sellBalconies": balconyController.text,
-      //     "sellContact": contactController.text,
-      //     "sellDescription": descriptionController.text,
-      //     "updatedAt": DateTime.now().toIso8601String(),
-      //   });
-      // } else {
-      //   await propertySellReference.child(rentModel.id ?? "").update({
-      //     "id": rentModel.id,
-      //     "sellType": selected,
-      //     "images": imagePaths.isNotEmpty ? imagePaths : "",
-      //     "sellAddress": addressController.text,
-      //     "sellCity": cityController.text,
-      //     "sellRegion": regionController.text,
-      //     "sellCountry": countryController.text,
-      //     "sellPrice": priceController.text,
-      //     "sellBathrooms": bathroomController.text,
-      //     "bedrooms": bedroomController.text,
-      //     "sellBalconies": balconyController.text,
-      //     "sellContact": contactController.text,
-      //     "sellDescription": descriptionController.text,
-      //     "updatedAt": DateTime.now().toIso8601String(),
-      //   });
-      // }
-      var x = Future.delayed(const Duration(seconds: 3), () {
-        var newModel = PropertyModel(
-          id: "--",
-          userId: "1",
-          availability: true,
-          images: _imageFilesList,
-          price: _price.toString(),
+        // Create a PropertyModel instance with all details including image URLs
+        PropertyModel property = PropertyModel(
+          userId: uid,
+          propertyType: propertyTypes[selected + 1]['name'],
+          images: imageUrls,
           region: _region,
           city: _city,
           subcity: _subcity,
-          //details: {"bedrooms": 1, "bathrooms": 5},
-          details: _detailTextValues,
-          description: _description,
+          price: _price.toString(),
           contact: _contact,
+          description: _description,
           updatedAt: DateTime.now().toIso8601String(),
         );
+        print("///////////////////////////////////");
+        print("Property Type: ${propertyTypes[selected + 1]['name']}");
+        print("Property Photos: $_imageFilesList");
+        print("Region: $_region, City: $_city, Sub-city: $_subcity");
+        print("Price: $_price");
+        print("Contact: $_contact");
+        print("Description: $_description");
+        print("///////////////////////////////////");
 
-        propertyRentList.insert(0, newModel);
-      });
+        DocumentReference docRef = await FirebaseFirestore.instance
+            .collection('properties')
+            .add(property.toMap());
 
-      await x;
+// Set the auto-generated document ID to your PropertyModel instance
+        String propertyId = docRef.id;
+        property.id = propertyId;
 
-      setState(() {
-        isUploadingPost = false;
-      });
-
-      if (mounted) {
+// Now you can store the updated PropertyModel instance with the document ID
+        await docRef.set(property.toMap());
+        // Hide loading indicator
         Navigator.of(context).pop();
-      }
-    } catch (error) {
-      print("catch block : $error");
+        _showSuccessAnimation();
 
-      setState(() {
-        isUploadingPost = false;
-      });
-      const snackBar =
-          SnackBar(content: Text("Something went wrong. please try again !!"));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        // Clear the form and image list
+        _clearForm();
+      } catch (e) {
+        // Hide loading indicator
+        Navigator.of(context).pop();
+        // Show error message
+        _showErrorAnimation();
+      }
     }
+  }
+
+  Future<List<String>> _uploadImages() async {
+    List<String> imageUrls = [];
+
+    // Upload each image to Firebase Storage
+    for (String imagePath in _imageFilesList) {
+      File imageFile = File(imagePath);
+      String imageName = Path.basename(imageFile.path);
+      Reference storageReference =
+          FirebaseStorage.instance.ref().child('images/$imageName');
+
+      try {
+        // Upload image
+        await storageReference.putFile(imageFile);
+
+        // Get download URL
+        String downloadURL = await storageReference.getDownloadURL();
+        imageUrls.add(downloadURL);
+      } catch (e) {
+        print('Failed to upload image: $e');
+      }
+    }
+
+    return imageUrls;
+  }
+
+  void _clearForm() {
+    setState(() {
+      _subcity = "";
+      _city = "";
+      _region = "";
+      _description = "";
+      _contact = "";
+      _price = 0.0;
+      selected = 0;
+      _imageFilesList.clear();
+    });
+  }
+
+  void _showSuccessAnimation() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Center(
+          child: Material(
+            type: MaterialType.transparency,
+            child: ScaleTransition(
+              scale: CurvedAnimation(
+                parent: ModalRoute.of(context)!.animation!,
+                curve: Curves.easeOutBack,
+                reverseCurve: Curves.easeInBack,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(20.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 3,
+                      blurRadius: 7,
+                      offset: const Offset(0, 3), // changes position of shadow
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                      size: 60.0,
+                    ),
+                    const SizedBox(height: 20.0),
+                    const Text(
+                      'Property posted successfully!',
+                      style: TextStyle(fontSize: 18.0),
+                    ),
+                    const SizedBox(height: 20.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close the dialog
+                        Navigator.of(context).pushReplacementNamed(
+                            '/property_listing'); // Navigate to home screen
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showErrorAnimation() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: const Text('Failed to post property. Please try again.  '),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
