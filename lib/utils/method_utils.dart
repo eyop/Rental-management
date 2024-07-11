@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:rental_management/models/property_model.dart';
 
 RegExp regExp = RegExp(urlExpression);
 // check for web url expression
@@ -70,4 +72,32 @@ Widget placeHolderAssetWithDims(double Width, double Height) {
     height: Height,
     width: Width,
   );
+}
+
+class MethodUtils {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<void> addRentProperty(PropertyModel property) async {
+    try {
+      await _firestore.collection('properties').add(property.toMap());
+    } catch (e) {
+      print('Error adding property: $e');
+      throw Exception('Failed to add property');
+    }
+  }
+
+  Future<void> updateRentProperty(
+      String propertyId, PropertyModel property) async {
+    try {
+      await _firestore
+          .collection('properties')
+          .doc(propertyId)
+          .update(property.toMap());
+    } catch (e) {
+      print('Error updating property: $e');
+      throw Exception('Failed to update property');
+    }
+  }
+
+  // Add more methods as per your application needs
 }
