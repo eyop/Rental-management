@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:rental_management/models/property_model.dart';
-
 import '../utils/method_utils.dart';
 
 class PropertyDetails extends StatefulWidget {
@@ -9,9 +8,9 @@ class PropertyDetails extends StatefulWidget {
   final PropertyModel rentModel;
 
   const PropertyDetails({
-    super.key,
+    Key? key,
     required this.rentModel,
-  });
+  }) : super(key: key);
 
   @override
   State<PropertyDetails> createState() => _PropertyDetailsState();
@@ -20,10 +19,12 @@ class PropertyDetails extends StatefulWidget {
 class _PropertyDetailsState extends State<PropertyDetails> {
   int currentView = 1;
   var dateFormat = DateFormat("dd MM, yyyy");
+
   @override
   Widget build(BuildContext context) {
     final postedDate = getDateFromDateTimeInSpecificFormat(
-        dateFormat, widget.rentModel.updatedAt ?? "yyyy-MM-dd");
+        dateFormat, widget.rentModel.updatedAt ?? "dd MM, yyyy");
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -77,19 +78,12 @@ class _PropertyDetailsState extends State<PropertyDetails> {
           ),
         )
         .toList();
-    // return Padding(
-    //   //   padding: const EdgeInsets.symmetric(vertical: 10),
-    //   child: SizedBox(
-    //     height: MediaQuery.of(context).size.width * .45,
-    //     child: ListView(children: subWidgets),
-    //   ),
-    // );
+
     return subWidgets;
   }
 
   Widget _buildSliverAppBar() {
     return SliverAppBar(
-      //backgroundColor: themeColor,
       pinned: true,
       titleSpacing: 0.0,
       expandedHeight: MediaQuery.of(context).size.height * 0.3,
@@ -98,7 +92,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
         background: Hero(
           tag: widget.rentModel.id ?? "selected",
           child: widget.rentModel.images != null &&
-                  (widget.rentModel.images?.length ?? 0) > 0
+                  widget.rentModel.images!.isNotEmpty
               ? Stack(
                   children: <Widget>[
                     PageView.builder(
@@ -107,7 +101,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                           currentView = view + 1;
                         });
                       },
-                      itemCount: widget.rentModel.images?.length,
+                      itemCount: widget.rentModel.images!.length,
                       itemBuilder: (BuildContext context, int index) {
                         return _buildImageWidget(
                             widget.rentModel.images![index]);
@@ -124,7 +118,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                               padding: const EdgeInsets.only(
                                   top: 3.0, left: 5.0, bottom: 3.0, right: 3.0),
                               child: Text(
-                                "$currentView/${widget.rentModel.images?.length}",
+                                "$currentView/${widget.rentModel.images!.length}",
                                 style: const TextStyle(
                                     color: Colors.white, fontSize: 17.0),
                               ),
@@ -157,7 +151,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
           onTap: () {
             //_submitPropertySellPost();
             setState(() {
-              widget.rentModel.availability == false;
+              widget.rentModel.availability = false;
             });
           },
           child: Container(
@@ -225,18 +219,6 @@ class _PropertyDetailsState extends State<PropertyDetails> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _showPieceOfInfo(IconData iconData, String text) {
-    return Column(
-      children: [
-        Icon(
-          iconData,
-          size: 20,
-        ),
-        Text(text),
-      ],
     );
   }
 }
