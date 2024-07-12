@@ -1,8 +1,7 @@
 // import 'dart:io';
 
 // import 'package:flutter/material.dart';
-// import 'package:image_picker/image_picker.dart';
-// import 'package:firebase_core/firebase_core.dart';
+// import 'package:image_picker/image_picker.dar import 'package:firebase_core/firebase_core.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:provider/provider.dart';
 // import 'package:rental_management/providers/authentication_provider.dart';
@@ -955,7 +954,7 @@ class _PropertyPostState extends State<PropertyPost> {
 
         // Create a PropertyModel instance with all details including image URLs
         PropertyModel property = PropertyModel(
-          userId: uid,
+          userId: uid!,
           propertyType: propertyTypes[selected + 1]['name'],
           images: imageUrls,
           region: _region,
@@ -964,7 +963,9 @@ class _PropertyPostState extends State<PropertyPost> {
           price: _price.toString(),
           contact: _contact,
           description: _description,
+          availability: true,
           updatedAt: DateTime.now().toIso8601String(),
+          id: '',
         );
         print("///////////////////////////////////");
         print("Property Type: ${propertyTypes[selected + 1]['name']}");
