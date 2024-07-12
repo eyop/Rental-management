@@ -2,26 +2,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class PropertyModel {
-  String? id;
-  bool? availability;
+  String id;
+  final bool availability;
   List<String>? images;
-  String? price;
-  String? region;
-  String? city;
-  String? subcity;
-  String? description;
-  String? contact;
-  String? updatedAt;
-  String? userId;
-  String? propertyType;
+  final String price;
+  final String region;
+  final String city;
+  final String subcity;
+  final String description;
+  final String contact;
+  final String updatedAt;
+  final String userId;
+  final String? propertyType;
 
   Map<String, dynamic>? details;
 
   PropertyModel({
-    this.id,
+    required this.id,
     required this.userId,
     required this.images,
-    this.availability,
+    required this.availability,
     required this.region,
     required this.city,
     required this.subcity,
@@ -35,10 +35,10 @@ class PropertyModel {
 
   factory PropertyModel.fromFirestore(Map<String, dynamic> data) {
     return PropertyModel(
-      id: data['id'] ?? '',
+      id: data['id'],
       availability: data['availability'] ?? false,
       images: List<String>.from(data['images'] ?? []),
-      price: data['price'] ?? 0.0,
+      price: data['price'].toString(),
       region: data['region'] ?? '',
       city: data['city'] ?? '',
       subcity: data['subcity'] ?? '',
@@ -47,7 +47,7 @@ class PropertyModel {
       updatedAt: data['updatedAt'] ?? '',
       userId: data['userId'] ?? '',
       propertyType: data['propertyType'] ?? '',
-      details: Map<String, dynamic>.from(data['details'] ?? {}),
+      details: {},
     );
   }
 
