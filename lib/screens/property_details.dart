@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:rental_management/models/property_model.dart';
@@ -276,6 +277,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
           "ETB. ${widget.rentModel.price}", // Display property price in app bar
           style: const TextStyle(
             color: Colors.blueAccent,
+            fontWeight: FontWeight.w600,
             shadows: [
               Shadow(
                 offset: Offset(0, 1),
@@ -416,7 +418,8 @@ class _PropertyDetailsState extends State<PropertyDetails> {
               "Posted on $postedDate", // Display property posted date
               textAlign: TextAlign.center,
               softWrap: true,
-              style: const TextStyle(fontSize: 16.0, color: Colors.grey),
+              style: GoogleFonts.openSans(
+                  fontSize: 15, fontWeight: FontWeight.w500, letterSpacing: 1),
             ),
           ),
         ),
@@ -447,21 +450,18 @@ class _PropertyDetailsState extends State<PropertyDetails> {
             padding: const EdgeInsets.all(8.0),
             child: Text(
               label,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18.0,
-                color: Colors.black87,
-              ),
+              style: GoogleFonts.openSans(
+                  fontSize: 18, fontWeight: FontWeight.w700, letterSpacing: 1),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
               value,
-              style: const TextStyle(
-                fontSize: 16.0,
-                color: Colors.grey,
-              ),
+              style: GoogleFonts.openSans(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 1.2),
             ),
           ),
         ],

@@ -19,8 +19,10 @@ class PropertyListing extends StatefulWidget {
   State<PropertyListing> createState() => _PropertyListingState();
 }
 
-class _PropertyListingState extends State<PropertyListing> {
+class _PropertyListingState extends State<PropertyListing>
+    with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  late TabController _tabController;
   bool isFetching = false;
   String? uid;
 
@@ -32,7 +34,22 @@ class _PropertyListingState extends State<PropertyListing> {
   void initState() {
     super.initState();
     uid = context.read<AuthenticationProvider>().uid;
+    _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(_handleTabChange);
     _fetchData();
+  }
+
+  @override
+  void dispose() {
+    _tabController.removeListener(_handleTabChange);
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  void _handleTabChange() {
+    if (_tabController.indexIsChanging) {
+      _fetchData();
+    }
   }
 
   Future<void> _fetchData() async {
@@ -109,10 +126,11 @@ class _PropertyListingState extends State<PropertyListing> {
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(60),
             child: Container(
-              color: Colors.red,
-              child: const TabBar(
-                labelColor: Colors.white,
-                tabs: [
+              //color: Colors.red,
+              child: TabBar(
+                controller: _tabController,
+                labelColor: Colors.blueAccent,
+                tabs: const [
                   Tab(icon: Icon(Icons.list), text: "Properties"),
                   Tab(
                       icon: Icon(Icons.request_page),
@@ -129,7 +147,7 @@ class _PropertyListingState extends State<PropertyListing> {
             children: <Widget>[
               const DrawerHeader(
                 decoration: BoxDecoration(
-                  color: Colors.red,
+                  color: Colors.blueGrey,
                 ),
                 child: Text(
                   'Menu',
@@ -215,6 +233,7 @@ class _PropertyListingState extends State<PropertyListing> {
           ),
         ),
         body: TabBarView(
+          controller: _tabController,
           children: [
             RefreshIndicator(
               onRefresh: _refreshData,
