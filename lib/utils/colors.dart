@@ -18,13 +18,13 @@ class CustomTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0),
           ),
-          padding: EdgeInsets.symmetric(vertical: 15.0),
+          padding: const EdgeInsets.symmetric(vertical: 15.0),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: Colors.blue,
-          textStyle: TextStyle(
+          textStyle: const TextStyle(
             fontSize: 16.0,
           ),
         ),
@@ -33,7 +33,8 @@ class CustomTheme {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
       ),
     );
   }
