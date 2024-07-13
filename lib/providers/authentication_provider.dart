@@ -1,9 +1,14 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:rental_management/models/property_model.dart';
+import 'package:rental_management/models/rent_model.dart';
 import 'package:rental_management/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path/path.dart' as path;
 
 class AuthenticationProvider extends ChangeNotifier {
   bool _isLoading = false;
@@ -144,5 +149,145 @@ class AuthenticationProvider extends ChangeNotifier {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.clear();
     notifyListeners();
+    //Navigator.of(context).pushReplacementNamed('/');
+  }
+
+  // Fetch properties from Firestore
+  Future<List<PropertyModel>> fetchProperties() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('properties')
+          .where('availability', isEqualTo: true)
+          .get();
+      List<PropertyModel> properties = querySnapshot.docs
+          .map((doc) =>
+              PropertyModel.fromFirestore(doc.data() as Map<String, dynamic>))
+          .toList();
+      return properties;
+    } catch (e) {
+      print('Error fetching properties: $e');
+      throw e;
+    }
+  }
+
+  // Fetch requested properties
+  Future<List<RentModel>> fetchRequestProps() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('rental_requests')
+          .where('ownerId',
+              isEqualTo: _uid) // Assuming _uid is set during authentication
+          .get();
+      List<RentModel> requestedProps = querySnapshot.docs
+          .map((doc) => RentModel.fromFirestore(doc))
+          .toList();
+
+      return requestedProps;
+    } catch (e) {
+      print('Error fetching requested properties: $e');
+      throw e;
+    }
+  }
+
+  // Fetch sent requests where current user is the requester
+  Future<List<RentModel>> fetchSentRequests() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('rental_requests')
+          .where('userId',
+              isEqualTo: _uid) // Assuming _uid is set during authentication
+          .get();
+      List<RentModel> sentRequests = querySnapshot.docs
+          .map((doc) => RentModel.fromFirestore(doc))
+          .toList();
+      return sentRequests;
+    } catch (e) {
+      print('Error fetching sent requests: $e');
+      throw e;
+    }
+  }
+
+  // Check if the current user can request rent for a property
+  Future<bool> canRequestRent(String propertyId) async {
+    try {
+      final userModel = _userModel;
+      if (userModel != null) {
+        var querySnapshot = await FirebaseFirestore.instance
+            .collection('rental_requests')
+            .where('ownerId', isEqualTo: propertyId)
+            .get();
+
+        return querySnapshot.docs.isEmpty;
+      }
+      return false;
+    } catch (e) {
+      print('Error checking if user can request rent: $e');
+      throw e;
+    }
+  }
+
+  // Handle user's request to rent the property
+  Future<void> createRentalRequest(
+      {String? userId,
+      String? username,
+      required String ownerId,
+      required String propertyId,
+      required String status}) async {
+    try {
+      final userModel = _userModel;
+      var request = await FirebaseFirestore.instance
+          .collection('rental_requests')
+          .doc(propertyId)
+          .get();
+
+      if (!request.exists) {
+        await FirebaseFirestore.instance
+            .collection('rental_requests')
+            .doc(propertyId)
+            .set({
+          'userId': _uid, // ID of the user making the request
+          'name': userModel?.username, // Name of the user making the request
+          'ownerId': ownerId, // ID of the user receiving the request
+          'propertyId': propertyId, // ID of the property being requested
+          'status': 'requested', // Initial status of the request
+          'timestamp': FieldValue
+              .serverTimestamp(), // Timestamp of when the request was made
+        });
+      }
+    } catch (e) {
+      print('Error handling request to rent property: $e');
+      throw e;
+    }
+  }
+
+  // Cancel user's existing request to rent the property
+  Future<void> cancelRequestToRentProperty(String propertyId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('rental_requests')
+          .doc(propertyId)
+          .delete();
+    } catch (e) {
+      print('Error canceling request to rent property: $e');
+      throw e;
+    }
+  }
+
+  Future<String> uploadImage(File imageFile) async {
+    try {
+      String imageName = path.basename(imageFile.path);
+      Reference storageReference =
+          FirebaseStorage.instance.ref().child('images/$imageName');
+
+      // Upload image to Firebase Storage
+      await storageReference.putFile(imageFile);
+
+      // Get download URL
+      String downloadURL = await storageReference.getDownloadURL();
+      return downloadURL;
+    } catch (e) {
+      print('Failed to upload image: $e');
+      throw e; // Rethrow the exception to handle it in the UI
+    }
   }
 }
