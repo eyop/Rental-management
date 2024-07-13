@@ -1,16 +1,49 @@
-# rental_management
+# Property Rental Management System
 
-A new Flutter project.
+## Description
+
+The Property Rental Management System is a Flutter application integrated with Firebase to manage property listings, rental requests, and user authentication.
+
+## Table of Contents
+
+- Description
+- Features
+- Technologies Used
+- Getting Started
+- Usage
+- Screenshots
+- License
+
+## Features
+
+- Property listing with detailed descriptions
+- Rental request management
+- User authentication and authorization
+- Image upload and storage with Firebase Storage
+
+## Technologies Used
+
+- Flutter
+- Firebase (Firestore, Authentication, Storage)
+- Provider for state management
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+To run this project locally, follow these steps:
 
-A few resources to get you started if this is your first Flutter project:
+1. Clone the repository.
+2. Install dependencies with `flutter pub get`.
+3. Set up Firebase project and add `google-services.json` to `android/app` or `GoogleService-Info.plist` to `ios/Runner`.
+4. Run the app with `flutter run`.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Usage
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Sign in or create an account.
+2. Browse available properties.
+3. View property details and request rentals.
+4. Manage your properties and rental requests.
+
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
