@@ -1,10 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:rental_management/models/property_model.dart';
-import 'package:rental_management/models/user_model.dart';
+import 'package:rental_management/models/rent_model.dart';
 import 'package:rental_management/providers/authentication_provider.dart';
+import 'package:rental_management/screens/editProperty_Screen.dart';
 import '../utils/method_utils.dart'; // Import your utility methods here
 
 class PropertyDetails extends StatefulWidget {
@@ -12,9 +13,9 @@ class PropertyDetails extends StatefulWidget {
   final PropertyModel rentModel; // Property model passed to this widget
 
   const PropertyDetails({
-    Key? key,
+    super.key,
     required this.rentModel,
-  }) : super(key: key);
+  });
 
   @override
   State<PropertyDetails> createState() => _PropertyDetailsState();
@@ -28,12 +29,24 @@ class _PropertyDetailsState extends State<PropertyDetails> {
   Color requestButtonColor = Colors.blueAccent; // Initial request button color
   bool showCancelButton = false; // Whether to show cancel button
   bool canRequestRent = false; // Whether the user can request rent
+  bool isOwner = false; // Whether the current user is the owner
 
   @override
   void initState() {
     super.initState();
     _checkRequestStatus(); // Check initial request status
     _checkIfUserCanRequestRent(); // Check if the user can request rent
+    _checkIfUserIsOwner(); // Check if the user is the owner of the property
+  }
+
+  // Check if the current user is the owner of this property
+  Future<void> _checkIfUserIsOwner() async {
+    final userModel = context.read<AuthenticationProvider>().userModel;
+    if (userModel != null && userModel.uid == widget.rentModel.userId) {
+      setState(() {
+        isOwner = true;
+      });
+    }
   }
 
   // Check if the current user can request rent for this property
@@ -48,15 +61,30 @@ class _PropertyDetailsState extends State<PropertyDetails> {
 
   // Check if user has already requested this property
   Future<void> _checkRequestStatus() async {
-    var querySnapshot = await FirebaseFirestore.instance
-        .collection('rental_requests')
-        .where('ownerId', isEqualTo: widget.rentModel.id)
-        .get();
+    // final userModel = context.read<AuthenticationProvider>().userModel;
+    var rentModels =
+        await context.read<AuthenticationProvider>().fetchSentRequests();
 
-    if (querySnapshot.docs.isNotEmpty) {
-      // Assuming you want to check the status of the first matching document
-      var request = querySnapshot.docs.first;
-      String status = request.data()['status'] ?? 'requested';
+    // RentModel? existingRequest = rentModels as RentModel?;
+    RentModel? existingRequest;
+    try {
+      existingRequest = rentModels.firstWhere(
+        (rentModel) => rentModel.propertyId == widget.rentModel.id,
+      );
+    } catch (e) {
+      // Handle exceptions or null cases gracefully
+      print('Error finding existing request: $e');
+    }
+
+// // Check if existingRequest is not null before using it
+//     if (existingRequest != null) {
+//       // Existing request found, do something with existingRequest
+//     } else {
+//       // No existing request found, handle accordingly
+//     }
+
+    if (existingRequest != null) {
+      String status = existingRequest.status ?? 'requested';
       _updateRequestStatus(status);
     }
   }
@@ -80,6 +108,11 @@ class _PropertyDetailsState extends State<PropertyDetails> {
           requestButtonColor = Colors.red;
           showCancelButton = false;
           break;
+        case 'terminated':
+          requestStatus = "Sorry It is Rented Out";
+          requestButtonColor = Colors.red;
+          showCancelButton = false;
+          break;
         default:
           requestStatus = "Request Rent";
           requestButtonColor = Colors.blueAccent;
@@ -91,25 +124,38 @@ class _PropertyDetailsState extends State<PropertyDetails> {
   // Handle user's request to rent the property
   Future<void> _handleRequest() async {
     final userModel = context.read<AuthenticationProvider>().userModel;
+
+    if (userModel == null) {
+      // Handle case where userModel is null (not expected if properly authenticated)
+      return;
+    }
+
+    // var requestExists =
+    //     await context.read<AuthenticationProvider>().fetchSentRequests();
     var request = await FirebaseFirestore.instance
         .collection('rental_requests')
         .doc(widget.rentModel.id)
         .get();
-
-    if (!request.exists) {
+    if (!request.exists)
+    // if (!requestExists.isNotEmpty)
+    {
+      // print("/////////////////////////////////////////////////");
+      // print(userModel.uid);
+      // print(userModel.username);
+      // print(widget.rentModel.userId);
+      // print(widget.rentModel.id);
+      // print("/////////////////////////////////////////////////");
       // If request doesn't exist, create a new request document
-      await FirebaseFirestore.instance
-          .collection('rental_requests')
-          .doc(widget.rentModel.id)
-          .set({
-        'userId': widget.rentModel.userId, // ID of the user making the request
-        'name': userModel?.username, // ID of the user making the request
-        'ownerId': userModel?.uid, // ID of the user receiving the request
-        'propertyId': widget.rentModel.id, // ID of the property being requested
-        'status': 'requested', // Initial status of the request
-        'timestamp': FieldValue
-            .serverTimestamp(), // Timestamp of when the request was made
-      });
+      await context.read<AuthenticationProvider>().createRentalRequest(
+            userId: userModel.uid, // ID of the user making the request
+            username:
+                userModel.username, // username of the user making the request
+            ownerId:
+                widget.rentModel.userId, // ID of the user receiving the request
+            propertyId:
+                widget.rentModel.id, // ID of the property being requested
+            status: 'requested', // Initial status of the request
+          );
 
       _updateRequestStatus('requested'); // Update UI with new request status
     }
@@ -117,10 +163,9 @@ class _PropertyDetailsState extends State<PropertyDetails> {
 
   // Cancel user's existing request to rent the property
   Future<void> _cancelRequest() async {
-    await FirebaseFirestore.instance
-        .collection('rental_requests')
-        .doc(widget.rentModel.id)
-        .delete();
+    await context
+        .read<AuthenticationProvider>()
+        .cancelRequestToRentProperty(widget.rentModel.id);
 
     setState(() {
       // Reset UI to initial state after canceling the request
@@ -143,6 +188,30 @@ class _PropertyDetailsState extends State<PropertyDetails> {
               postedDate), // Build the body with property details
         ],
       ),
+      floatingActionButton: isOwner
+          ? FloatingActionButton(
+              onPressed: () {
+                // // Navigate to the edit screen
+                // Navigator.pushNamed(context, '/edit-property',
+                //     arguments: widget.rentModel);
+                // MaterialPageRoute(
+                //   builder: (context) => EditPropertyScreen(
+                //     propertyModel: widget.rentModel,
+                //   ),
+
+                // );
+
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => EditPropertyScreen(
+                      propertyModel: widget.rentModel,
+                    ),
+                  ),
+                );
+              },
+              child: Icon(Icons.edit),
+            )
+          : null,
     );
   }
 
@@ -206,7 +275,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
         title: Text(
           "ETB. ${widget.rentModel.price}", // Display property price in app bar
           style: const TextStyle(
-            color: Colors.white,
+            color: Colors.blueAccent,
             shadows: [
               Shadow(
                 offset: Offset(0, 1),
@@ -353,11 +422,11 @@ class _PropertyDetailsState extends State<PropertyDetails> {
         ),
         ..._buildPropertyDetails(), // Display property details
         _propertyAddressView("Region",
-            widget.rentModel.region!), // Display property address details
-        _propertyAddressView("City", widget.rentModel.city!),
-        _propertyAddressView("Subcity", widget.rentModel.subcity!),
-        _propertyAddressView("Contact", widget.rentModel.contact!),
-        _propertyAddressView("Description", widget.rentModel.description ?? ''),
+            widget.rentModel.region), // Display property address details
+        _propertyAddressView("City", widget.rentModel.city),
+        _propertyAddressView("Subcity", widget.rentModel.subcity),
+        _propertyAddressView("Contact", widget.rentModel.contact),
+        _propertyAddressView("Description", widget.rentModel.description),
       ]),
     );
   }
@@ -375,22 +444,24 @@ class _PropertyDetailsState extends State<PropertyDetails> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 20.0, vertical: 2.5),
+            padding: const EdgeInsets.all(8.0),
             child: Text(
               label,
               style: const TextStyle(
-                  fontSize: 15.0,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87),
+                fontWeight: FontWeight.bold,
+                fontSize: 18.0,
+                color: Colors.black87,
+              ),
             ),
           ),
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 20.0, vertical: 2.5),
+            padding: const EdgeInsets.all(8.0),
             child: Text(
               value,
-              style: const TextStyle(fontSize: 12.0, color: Colors.black54),
+              style: const TextStyle(
+                fontSize: 16.0,
+                color: Colors.grey,
+              ),
             ),
           ),
         ],
@@ -398,3 +469,18 @@ class _PropertyDetailsState extends State<PropertyDetails> {
     );
   }
 }
+
+// Utility method to fetch image
+Widget fetchImageWithPlaceHolder(String imageUrl) => imageUrl.isNotEmpty
+    ? Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+      )
+    : placeholderAssetWidget();
+
+// Placeholder widget for images
+Widget placeholderAssetWidget() => const Icon(
+      Icons.house_outlined,
+      size: 120.0,
+      color: Colors.black26,
+    );
