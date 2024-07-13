@@ -7,7 +7,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:rental_management/models/property_model.dart';
 import 'package:rental_management/providers/authentication_provider.dart';
-import 'package:rental_management/utils/method_utils.dart';
 
 class EditPropertyScreen extends StatefulWidget {
   final PropertyModel propertyModel;
