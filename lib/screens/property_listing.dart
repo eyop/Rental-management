@@ -150,16 +150,20 @@ class _PropertyListingState extends State<PropertyListing>
                   color: Colors.blueGrey,
                 ),
                 child: Text(
-                  'Menu',
+                  'Welcome',
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                  ),
+                      color: Colors.white, fontSize: 24, letterSpacing: 1.5),
                 ),
               ),
               ListTile(
                 leading: const Icon(Icons.cabin),
-                title: const Text('Properties Posted'),
+                title: const Text(
+                  'Properties Posted',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1),
+                ),
                 subtitle: StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('properties')
@@ -175,7 +179,13 @@ class _PropertyListingState extends State<PropertyListing>
               ),
               ListTile(
                 leading: const Icon(Icons.check),
-                title: const Text('Properties Rented'),
+                title: const Text(
+                  'Properties Rented',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1),
+                ),
                 subtitle: StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('rental_requests')
@@ -192,7 +202,13 @@ class _PropertyListingState extends State<PropertyListing>
               ),
               ListTile(
                 leading: const Icon(Icons.person),
-                title: const Text('Profile'),
+                title: const Text(
+                  'Profile',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1),
+                ),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -202,7 +218,13 @@ class _PropertyListingState extends State<PropertyListing>
               ),
               ListTile(
                 leading: const Icon(Icons.privacy_tip),
-                title: const Text('Privacy Policy'),
+                title: const Text(
+                  'Privacy Policy',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1),
+                ),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -213,7 +235,13 @@ class _PropertyListingState extends State<PropertyListing>
               ),
               ListTile(
                 leading: const Icon(Icons.info),
-                title: const Text('About'),
+                title: const Text(
+                  'About',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1),
+                ),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -223,7 +251,13 @@ class _PropertyListingState extends State<PropertyListing>
               ),
               ListTile(
                 leading: const Icon(Icons.logout),
-                title: const Text('Logout'),
+                title: const Text(
+                  'Logout',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1),
+                ),
                 onTap: () {
                   context.read<AuthenticationProvider>().logout();
                   Navigator.of(context).pushReplacementNamed('/');
