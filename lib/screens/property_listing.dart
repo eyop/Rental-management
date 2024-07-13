@@ -4,14 +4,16 @@ import 'package:provider/provider.dart';
 import 'package:rental_management/models/property_model.dart';
 import 'package:rental_management/models/rent_model.dart';
 import 'package:rental_management/providers/authentication_provider.dart';
-import 'package:rental_management/screens/property_details.dart';
+import 'package:rental_management/screens/aboutpage_screen.dart';
+import 'package:rental_management/screens/privacyPolicy_Screen.dart';
+import 'package:rental_management/screens/profileScreen.dart';
 import 'package:rental_management/screens/property_post.dart';
-import 'package:rental_management/widgets/propertyListWidget.dart';
-import 'package:rental_management/widgets/requestedListWidget.dart';
-import 'package:rental_management/widgets/sentRequestsListWidget.dart';
+import 'package:rental_management/widgets/property_ListWidget.dart';
+import 'package:rental_management/widgets/recevedRequest_ListWidget.dart';
+import 'package:rental_management/widgets/sentRequests_ListWidget.dart';
 
 class PropertyListing extends StatefulWidget {
-  const PropertyListing({Key? key}) : super(key: key);
+  const PropertyListing({super.key});
 
   @override
   State<PropertyListing> createState() => _PropertyListingState();
@@ -23,8 +25,8 @@ class _PropertyListingState extends State<PropertyListing> {
   String? uid;
 
   List<PropertyModel> propertyRentList = [];
-  List<RentModel> requestedProps = [];
-  List<RentModel> sentRequests = [];
+  List<RentModel> requestedProps1 = [];
+  List<RentModel> sentRequests1 = [];
 
   @override
   void initState() {
@@ -38,8 +40,9 @@ class _PropertyListingState extends State<PropertyListing> {
       setState(() {
         isFetching = true;
       });
+      // Fetch property lists concurrently using AuthenticationProvider
       await Future.wait([
-        _fetchPropertyList(),
+        _fetchProperties(),
         _fetchRequestedProps(),
         _fetchSentRequests(),
       ]);
@@ -55,15 +58,12 @@ class _PropertyListingState extends State<PropertyListing> {
     }
   }
 
-  Future<void> _fetchPropertyList() async {
+  Future<void> _fetchProperties() async {
     try {
-      QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection('properties').get();
+      List<PropertyModel> properties =
+          await context.read<AuthenticationProvider>().fetchProperties();
       setState(() {
-        propertyRentList = querySnapshot.docs
-            .map((doc) =>
-                PropertyModel.fromFirestore(doc.data() as Map<String, dynamic>))
-            .toList();
+        propertyRentList = properties;
       });
     } catch (e) {
       print('Error fetching properties: $e');
@@ -72,14 +72,10 @@ class _PropertyListingState extends State<PropertyListing> {
 
   Future<void> _fetchRequestedProps() async {
     try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('rental_requests')
-          .where('ounerId', isEqualTo: uid) // Adjust query as needed
-          .get();
+      List<RentModel> requestedProps =
+          await context.read<AuthenticationProvider>().fetchRequestProps();
       setState(() {
-        requestedProps = querySnapshot.docs
-            .map((doc) => RentModel.fromFirestore(doc))
-            .toList();
+        requestedProps1 = requestedProps;
       });
     } catch (e) {
       print('Error fetching requested properties: $e');
@@ -88,77 +84,163 @@ class _PropertyListingState extends State<PropertyListing> {
 
   Future<void> _fetchSentRequests() async {
     try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('rental_requests')
-          .where('userId', isEqualTo: uid) // Adjust query as needed
-          .get();
+      List<RentModel> sentRequests =
+          await context.read<AuthenticationProvider>().fetchSentRequests();
       setState(() {
-        sentRequests = querySnapshot.docs
-            .map((doc) => RentModel.fromFirestore(doc))
-            .toList();
+        sentRequests1 = sentRequests;
       });
     } catch (e) {
       print('Error fetching sent requests: $e');
     }
   }
 
+  Future<void> _refreshData() async {
+    await _fetchData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3, // Adjusted length for the new sent requests tab
+      length: 3,
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          backgroundColor: Colors.red,
-          foregroundColor: Colors.white,
           title: const Text("Property Listing"),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(60),
             child: Container(
-              color: Colors.black,
-              child: TabBar(
-                labelColor: Colors.redAccent,
-                unselectedLabelColor: Colors.white,
-                indicatorSize: TabBarIndicatorSize.tab,
-                indicator: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  color: Colors.white,
-                ),
+              color: Colors.red,
+              child: const TabBar(
+                labelColor: Colors.white,
                 tabs: [
+                  Tab(icon: Icon(Icons.list), text: "Properties"),
                   Tab(
-                    icon: Icon(Icons.list),
-                    text: "Properties",
-                  ),
-                  Tab(
-                    icon: Icon(Icons.request_page),
-                    text: "Requests",
-                  ),
-                  Tab(
-                    icon: Icon(Icons.send),
-                    text: "Sent Requests",
-                  ),
+                      icon: Icon(Icons.request_page),
+                      text: "Incoming Requests"),
+                  Tab(icon: Icon(Icons.send), text: "Sent Requests"),
                 ],
               ),
             ),
           ),
         ),
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              const DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                ),
+                child: Text(
+                  'Menu',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.cabin),
+                title: const Text('Properties Posted'),
+                subtitle: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('properties')
+                      .where('userId', isEqualTo: uid)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Text('Loading...');
+                    }
+                    return Text('${snapshot.data!.docs.length}');
+                  },
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.check),
+                title: const Text('Properties Rented'),
+                subtitle: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('rental_requests')
+                      .where('status', isEqualTo: 'accepted')
+                      .where('userId', isEqualTo: uid)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Text('Loading...');
+                    }
+                    return Text('${snapshot.data!.docs.length}');
+                  },
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.person),
+                title: const Text('Profile'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ProfileScreen()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.privacy_tip),
+                title: const Text('Privacy Policy'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PrivacyPolicyScreen()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.info),
+                title: const Text('About'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AboutScreen()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.logout),
+                title: const Text('Logout'),
+                onTap: () {
+                  context.read<AuthenticationProvider>().logout();
+                  Navigator.of(context).pushReplacementNamed('/');
+                },
+              ),
+            ],
+          ),
+        ),
         body: TabBarView(
           children: [
-            isFetching
-                ? Center(child: CircularProgressIndicator())
-                : PropertyListWidget(propertyRentList: propertyRentList),
-            RequestedListWidget(requestedProps1: requestedProps),
-            SentRequestsListWidget(sentRequests1: sentRequests),
+            RefreshIndicator(
+              onRefresh: _refreshData,
+              child: isFetching
+                  ? const Center(child: CircularProgressIndicator())
+                  : PropertyListWidget(propertyRentList: propertyRentList),
+            ),
+            RefreshIndicator(
+              onRefresh: _refreshData,
+              child: RecevedRequestListWidget(requestedProps1: requestedProps1),
+            ),
+            RefreshIndicator(
+              onRefresh: _refreshData,
+              child: SentRequestsListWidget(sentRequests1: sentRequests1),
+            ),
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.redAccent,
+          backgroundColor: Colors.deepPurpleAccent,
+          foregroundColor: Colors.white,
           onPressed: () {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (context) => const PropertyPost()),
             );
           },
-          child: const Icon(Icons.add, color: Colors.white),
+          child: const Icon(Icons.add),
         ),
       ),
     );
