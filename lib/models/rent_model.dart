@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RentModel {
-  String ounerId;
+  String ownerId;
   final String propertyId;
   final String userId;
   final String status;
@@ -9,7 +9,7 @@ class RentModel {
   final String name;
 
   RentModel({
-    required this.ounerId,
+    required this.ownerId,
     required this.propertyId,
     required this.userId,
     required this.status,
@@ -20,7 +20,7 @@ class RentModel {
   factory RentModel.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return RentModel(
-      ounerId: doc.id,
+      ownerId: doc.id,
       propertyId: data['propertyId'] ?? '',
       userId: data['userId'] ?? '',
       status: data['status'] ?? '',

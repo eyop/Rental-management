@@ -28,4 +28,17 @@ class UserModel {
       username: value['username'],
     );
   }
+  UserModel copyWith({
+    String? uid,
+    String? name,
+    String? email,
+    String? phone,
+  }) {
+    return UserModel(
+      uid: uid ?? this.uid,
+      username: name ?? this.username,
+      email: email ?? this.email,
+      contact: phone ?? this.contact,
+    );
+  }
 }
