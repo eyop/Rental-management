@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rental_management/models/property_model.dart';
 import 'package:rental_management/models/rent_model.dart';
 import 'package:rental_management/screens/property_details.dart';
+import 'package:rental_management/screens/property_listing.dart';
+import 'package:rental_management/utils/method_utils.dart';
 
 class SentRequestsListWidget extends StatefulWidget {
   final List<RentModel> sentRequests1;
@@ -16,6 +18,7 @@ class SentRequestsListWidget extends StatefulWidget {
 
 class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
   List<PropertyModel> sentRequests = [];
+  bool isFetching = true;
 
   @override
   void initState() {
@@ -24,6 +27,10 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
   }
 
   Future<void> _fetchSentRequests() async {
+    setState(() {
+      isFetching = true;
+    });
+
     try {
       List<PropertyModel> properties = [];
 
@@ -34,17 +41,23 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
             .doc(request.propertyId)
             .get();
 
-        PropertyModel property = PropertyModel.fromFirestore(
-          propertySnapshot.data() as Map<String, dynamic>,
-        );
-        properties.add(property);
+        if (propertySnapshot.exists) {
+          PropertyModel property = PropertyModel.fromFirestore(
+            propertySnapshot.data() as Map<String, dynamic>,
+          );
+          properties.add(property);
+        }
       }
 
       setState(() {
         sentRequests = properties;
+        isFetching = false;
       });
     } catch (e) {
       print('Error fetching sent requests: $e');
+      setState(() {
+        isFetching = false;
+      });
     }
   }
 
@@ -81,6 +94,11 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
 
       // Refresh UI after deletion
       _fetchSentRequests();
+      _showSuccessAnimation();
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => PropertyListing()),
+      // );
     } catch (e) {
       print('Error removing request: $e');
     }
@@ -88,212 +106,291 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return sentRequests.isEmpty
-        ? const Center(
-            child: Text(
-              "No data found!!",
-              style: TextStyle(fontSize: 20),
-            ),
-          )
-        : ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
-            itemCount: sentRequests.length,
-            itemBuilder: (BuildContext context, int index) {
-              var property = sentRequests[index];
-              var rentModel = widget.sentRequests1[index];
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PropertyDetails(
-                        rentModel: property,
-                      ),
-                    ),
-                  );
-                },
-                child: Card(
-                  margin:
-                      const EdgeInsets.only(top: 5.0, left: 5.0, right: 5.0),
-                  elevation: 5,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(10.0),
-                          bottomLeft: Radius.circular(10.0),
-                        ),
-                        child: SizedBox(
-                          height: 120,
-                          width: 120,
-                          child: Image.asset(
-                              "assets/images/bg_placeholder.jpg"), // Replace with your image logic
-                        ),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "ETB ${property.price}",
-                                style: TextStyle(
-                                  color: Theme.of(context).primaryColor,
-                                  fontSize: 18.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Requester: ${rentModel.name}",
-                                    style: TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily:
-                                          GoogleFonts.openSans().fontFamily,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    "Price: ${property.price}",
-                                    style: TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily:
-                                          GoogleFonts.openSans().fontFamily,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    "City: ${property.city}",
-                                    style: TextStyle(
-                                      fontSize: 14.0,
-                                      fontWeight: FontWeight.w600,
-                                      fontFamily:
-                                          GoogleFonts.openSans().fontFamily,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    "Description: ${property.description}",
-                                    style: TextStyle(
-                                      fontSize: 14.0,
-                                      fontWeight: FontWeight.w600,
-                                      fontFamily:
-                                          GoogleFonts.openSans().fontFamily,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              if (rentModel.status == 'requested') ...[
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 8.0),
-                                  child: Text(
-                                    "Waiting for approval",
-                                    style: TextStyle(
-                                      color: Colors.orange,
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.redAccent,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20.0),
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        _removeRequest(rentModel);
-                                      },
-                                      child: const Text(
-                                        "Cancel Request",
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                              if (rentModel.status == 'accepted') ...[
-                                const Padding(
-                                  padding: EdgeInsets.only(top: 8.0),
-                                  child: Text(
-                                    "You are approved",
-                                    style: TextStyle(
-                                      color: Colors.green,
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.blueAccent,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20.0),
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        _updateRequestStatus(
-                                            rentModel, 'terminated');
-                                      },
-                                      child: const Text(
-                                        "Terminate",
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                              if (rentModel.status == 'declined')
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  child: Text(
-                                    "Your request is declined",
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 16.0,
-                                    ),
-                                  ),
-                                ),
-                              if (rentModel.status == 'terminated')
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  child: Text(
-                                    "Terminated",
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 16.0,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+    if (isFetching) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (sentRequests.isEmpty) {
+      return const Center(
+        child: Text(
+          "No data found!!",
+          style: TextStyle(fontSize: 20),
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _fetchSentRequests,
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
+        itemCount: sentRequests.length,
+        itemBuilder: (BuildContext context, int index) {
+          var property = sentRequests[index];
+          var rentModel = widget.sentRequests1[index];
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PropertyDetails(
+                    rentModel: property,
                   ),
                 ),
               );
             },
-            separatorBuilder: (context, index) => const SizedBox(height: 20),
+            child: Card(
+              margin: const EdgeInsets.only(top: 5.0, left: 5.0, right: 5.0),
+              elevation: 5,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5.0)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(10.0),
+                      bottomLeft: Radius.circular(10.0),
+                    ),
+                    child: SizedBox(
+                      height: 120,
+                      width: 120,
+                      child: property.images == null ||
+                              property.images!.isEmpty ||
+                              property.images![0].isEmpty
+                          ? placeholderAssetWidget()
+                          : fetchImageWithPlaceHolder(property.images![0]),
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "ETB ${property.price}",
+                            style: TextStyle(
+                              color: Theme.of(context).primaryColor,
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Requester: ${rentModel.name}",
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: GoogleFonts.openSans().fontFamily,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "Price: ${property.price}",
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: GoogleFonts.openSans().fontFamily,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "City: ${property.city}",
+                                style: TextStyle(
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: GoogleFonts.openSans().fontFamily,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "Description: ${property.description}",
+                                style: TextStyle(
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: GoogleFonts.openSans().fontFamily,
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (rentModel.status == 'requested') ...[
+                            const Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                "Waiting for approval",
+                                style: TextStyle(
+                                  color: Colors.orange,
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.redAccent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    _removeRequest(rentModel);
+                                  },
+                                  child: const Text(
+                                    "Cancel Request",
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                          if (rentModel.status == 'accepted') ...[
+                            const Padding(
+                              padding: EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                "You are approved",
+                                style: TextStyle(
+                                  color: Colors.green,
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blueAccent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    _updateRequestStatus(
+                                        rentModel, 'terminated');
+                                  },
+                                  child: const Text(
+                                    "Terminate",
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                          if (rentModel.status == 'declined')
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Text(
+                                "Your request is declined",
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 16.0,
+                                ),
+                              ),
+                            ),
+                          if (rentModel.status == 'terminated')
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Text(
+                                "Terminated",
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 16.0,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           );
+        },
+        separatorBuilder: (context, index) => const SizedBox(height: 20),
+      ),
+    );
+  }
+
+  void _showSuccessAnimation() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Center(
+          child: Material(
+            type: MaterialType.transparency,
+            child: ScaleTransition(
+              scale: CurvedAnimation(
+                parent: ModalRoute.of(context)!.animation!,
+                curve: Curves.easeOutBack,
+                reverseCurve: Curves.easeInBack,
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(20.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 3,
+                      blurRadius: 7,
+                      offset: const Offset(0, 3), // changes position of shadow
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                      size: 60.0,
+                    ),
+                    const SizedBox(height: 20.0),
+                    const Text(
+                      'Action completed successfully!',
+                      style: TextStyle(fontSize: 18.0),
+                    ),
+                    const SizedBox(height: 20.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close the dialog
+                        Navigator.of(context).pushReplacementNamed(
+                            '/property_listing'); // Navigate to home screen
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }
+
+// Utility method to fetch image
+Widget fetchImageWithPlaceHolder(String imageUrl) => imageUrl.isNotEmpty
+    ? Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+      )
+    : placeholderAssetWidget();
+
+// Placeholder widget for images
+Widget placeholderAssetWidget() => const Icon(
+      Icons.house_outlined,
+      size: 120.0,
+      color: Colors.black26,
+    );
