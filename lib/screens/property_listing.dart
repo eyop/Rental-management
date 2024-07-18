@@ -36,6 +36,11 @@ class _PropertyListingState extends State<PropertyListing>
     uid = context.read<AuthenticationProvider>().uid;
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_handleTabChange);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _fetchData();
   }
 
@@ -122,7 +127,7 @@ class _PropertyListingState extends State<PropertyListing>
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          title: const Text("Property Listing"),
+          title: const Text("RentEase"),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(60),
             child: Container(
