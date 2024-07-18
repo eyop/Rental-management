@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rental_management/models/property_model.dart';
 import 'package:rental_management/models/rent_model.dart';
 import 'package:rental_management/screens/property_details.dart';
+import 'package:rental_management/utils/method_utils.dart';
 
 class RecevedRequestListWidget extends StatefulWidget {
   final List<RentModel> requestedProps1;
@@ -115,13 +116,14 @@ class _RecevedRequestListWidgetState extends State<RecevedRequestListWidget> {
                           bottomLeft: Radius.circular(10.0),
                         ),
                         child: SizedBox(
-                          height: 120,
-                          width: 120,
-                          child: Image.asset(
-                            "assets/images/bg_placeholder.jpg", // Replace with your image logic
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                            height: 120,
+                            width: 120,
+                            child: property.images == null ||
+                                    property.images!.isEmpty ||
+                                    property.images![0].isEmpty
+                                ? placeHolderAssetWidget()
+                                : fetchImageWithPlaceHolder(
+                                    property.images![0])),
                       ),
                       Expanded(
                         child: Padding(
@@ -279,3 +281,18 @@ class _RecevedRequestListWidgetState extends State<RecevedRequestListWidget> {
           );
   }
 }
+
+// Utility method to fetch image
+Widget fetchImageWithPlaceHolder(String imageUrl) => imageUrl.isNotEmpty
+    ? Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+      )
+    : placeholderAssetWidget();
+
+// Placeholder widget for images
+Widget placeholderAssetWidget() => const Icon(
+      Icons.house_outlined,
+      size: 120.0,
+      color: Colors.black26,
+    );
