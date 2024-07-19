@@ -25,8 +25,12 @@ class _PropertyListingState extends State<PropertyListing>
   late TabController _tabController;
   bool isFetching = false;
   String? uid;
+  String searchQuery = '';
+  String sortOption = 'price';
+  bool isAscending = true;
 
   List<PropertyModel> propertyRentList = [];
+  List<PropertyModel> filteredPropertyList = [];
   List<RentModel> requestedProps1 = [];
   List<RentModel> sentRequests1 = [];
 
@@ -86,6 +90,7 @@ class _PropertyListingState extends State<PropertyListing>
           await context.read<AuthenticationProvider>().fetchProperties();
       setState(() {
         propertyRentList = properties;
+        _filterAndSortProperties();
       });
     } catch (e) {
       print('Error fetching properties: $e');
@@ -120,6 +125,26 @@ class _PropertyListingState extends State<PropertyListing>
     await _fetchData();
   }
 
+  void _filterAndSortProperties() {
+    filteredPropertyList = propertyRentList
+        .where((property) =>
+            property.price.toLowerCase().contains(searchQuery.toLowerCase()) ||
+            property.description
+                .toLowerCase()
+                .contains(searchQuery.toLowerCase()))
+        .toList();
+
+    if (sortOption == 'price') {
+      filteredPropertyList.sort((a, b) => isAscending
+          ? a.price.compareTo(b.price)
+          : b.price.compareTo(a.price));
+    } else if (sortOption == 'type') {
+      filteredPropertyList.sort((a, b) => isAscending
+          ? a.propertyType!.compareTo(b.propertyType!)
+          : b.propertyType!.compareTo(a.propertyType!));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -128,22 +153,14 @@ class _PropertyListingState extends State<PropertyListing>
         key: _scaffoldKey,
         appBar: AppBar(
           title: const Text("RentEase"),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(60),
-            child: Container(
-              //color: Colors.red,
-              child: TabBar(
-                controller: _tabController,
-                labelColor: Colors.blueAccent,
-                tabs: const [
-                  Tab(icon: Icon(Icons.list), text: "Properties"),
-                  Tab(
-                      icon: Icon(Icons.request_page),
-                      text: "Incoming Requests"),
-                  Tab(icon: Icon(Icons.send), text: "Sent Requests"),
-                ],
-              ),
-            ),
+          bottom: TabBar(
+            controller: _tabController,
+            labelColor: Colors.blueAccent,
+            tabs: const [
+              Tab(icon: Icon(Icons.list), text: "Properties"),
+              Tab(icon: Icon(Icons.request_page), text: "Incoming Requests"),
+              Tab(icon: Icon(Icons.send), text: "Sent Requests"),
+            ],
           ),
         ),
         drawer: Drawer(
@@ -274,11 +291,79 @@ class _PropertyListingState extends State<PropertyListing>
         body: TabBarView(
           controller: _tabController,
           children: [
-            RefreshIndicator(
-              onRefresh: _refreshData,
-              child: isFetching
-                  ? const Center(child: CircularProgressIndicator())
-                  : PropertyListWidget(propertyRentList: propertyRentList),
+            Column(
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              searchQuery = value;
+                              _filterAndSortProperties();
+                            });
+                          },
+                          decoration: InputDecoration(
+                            hintText: 'Search...',
+                            prefixIcon: const Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide.none,
+                            ),
+                            filled: true,
+                            contentPadding: EdgeInsets.all(0),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      DropdownButton<String>(
+                        value: sortOption,
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'price',
+                            child: Text('Sort by Price'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'type',
+                            child: Text('Sort by Type'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            sortOption = value!;
+                            _filterAndSortProperties();
+                          });
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          isAscending
+                              ? Icons.arrow_upward
+                              : Icons.arrow_downward,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            isAscending = !isAscending;
+                            _filterAndSortProperties();
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: _refreshData,
+                    child: isFetching
+                        ? const Center(child: CircularProgressIndicator())
+                        : PropertyListWidget(
+                            propertyRentList: filteredPropertyList),
+                  ),
+                ),
+              ],
             ),
             RefreshIndicator(
               onRefresh: _refreshData,

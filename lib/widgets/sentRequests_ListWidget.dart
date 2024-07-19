@@ -6,6 +6,7 @@ import 'package:rental_management/models/rent_model.dart';
 import 'package:rental_management/screens/property_details.dart';
 import 'package:rental_management/screens/property_listing.dart';
 import 'package:rental_management/utils/method_utils.dart';
+import 'package:async/async.dart';
 
 class SentRequestsListWidget extends StatefulWidget {
   final List<RentModel> sentRequests1;
@@ -19,44 +20,65 @@ class SentRequestsListWidget extends StatefulWidget {
 class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
   List<PropertyModel> sentRequests = [];
   bool isFetching = true;
-
+  CancelableOperation<void>? _fetchOperation;
   @override
   void initState() {
     super.initState();
     _fetchSentRequests();
   }
 
+  @override
+  void dispose() {
+    _fetchOperation?.cancel(); // Cancel any ongoing fetch operation
+    super.dispose();
+  }
+
   Future<void> _fetchSentRequests() async {
+    _fetchOperation = CancelableOperation.fromFuture(_fetchProperties());
+
     setState(() {
       isFetching = true;
     });
 
     try {
-      List<PropertyModel> properties = [];
+      await _fetchOperation!.value;
 
-      // Fetch properties based on propertyIds in sentRequests1
-      for (var request in widget.sentRequests1) {
-        DocumentSnapshot propertySnapshot = await FirebaseFirestore.instance
-            .collection('properties')
-            .doc(request.propertyId)
-            .get();
-
-        if (propertySnapshot.exists) {
-          PropertyModel property = PropertyModel.fromFirestore(
-            propertySnapshot.data() as Map<String, dynamic>,
-          );
-          properties.add(property);
-        }
+      if (mounted) {
+        setState(() {
+          isFetching = false;
+        });
       }
-
-      setState(() {
-        sentRequests = properties;
-        isFetching = false;
-      });
     } catch (e) {
       print('Error fetching sent requests: $e');
+      if (mounted) {
+        setState(() {
+          isFetching = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _fetchProperties() async {
+    List<PropertyModel> properties = [];
+
+    // Fetch properties based on propertyIds in sentRequests1
+    for (var request in widget.sentRequests1) {
+      DocumentSnapshot propertySnapshot = await FirebaseFirestore.instance
+          .collection('properties')
+          .doc(request.propertyId)
+          .get();
+
+      if (propertySnapshot.exists) {
+        PropertyModel property = PropertyModel.fromFirestore(
+          propertySnapshot.data() as Map<String, dynamic>,
+        );
+        properties.add(property);
+      }
+    }
+
+    if (mounted) {
       setState(() {
-        isFetching = false;
+        sentRequests = properties;
       });
     }
   }
