@@ -205,7 +205,6 @@ class AuthenticationProvider extends ChangeNotifier {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('rental_requests')
-          .where('ownerId', isEqualTo: _uid) // Assuming _uid is set during authentication
           .get();
       List<RentModel> requestedProps = querySnapshot.docs
           .map((doc) => RentModel.fromFirestore(doc))
@@ -224,7 +223,8 @@ class AuthenticationProvider extends ChangeNotifier {
     print("Entering: fetchSentRequests");
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('rental_requests')// Assuming _uid is set during authentication
+          .collection('rental_requests')
+          .where('userId', isEqualTo: _uid) // Assuming _uid is set during authentication
           .get();
       List<RentModel> sentRequests = querySnapshot.docs
           .map((doc) => RentModel.fromFirestore(doc))

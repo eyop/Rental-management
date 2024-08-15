@@ -119,7 +119,7 @@ class _RecevedRequestListWidgetState extends State<RecevedRequestListWidget> {
                       const EdgeInsets.only(top: 5.0, left: 5.0, right: 5.0),
                   elevation: 5,
                   shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,7 +130,7 @@ class _RecevedRequestListWidgetState extends State<RecevedRequestListWidget> {
                           bottomLeft: Radius.circular(10.0),
                         ),
                         child: SizedBox(
-                            height: 120,
+                            height: 220,
                             width: 120,
                             child: property.images == null ||
                                     property.images!.isEmpty ||
@@ -150,7 +150,7 @@ class _RecevedRequestListWidgetState extends State<RecevedRequestListWidget> {
                                 "Property: ${property.propertyType}",
                                 style: TextStyle(
                                   color: Theme.of(context).primaryColor,
-                                  fontSize: 18.0,
+                                  fontSize: 16.0,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -160,7 +160,7 @@ class _RecevedRequestListWidgetState extends State<RecevedRequestListWidget> {
                                   Text(
                                     "Requester: ${rentModel.name}",
                                     style: const TextStyle(
-                                      fontSize: 16.0,
+                                      fontSize: 12.0,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -168,7 +168,7 @@ class _RecevedRequestListWidgetState extends State<RecevedRequestListWidget> {
                                   Text(
                                     "Price: ${property.price}",
                                     style: TextStyle(
-                                      fontSize: 16.0,
+                                      fontSize: 12.0,
                                       fontWeight: FontWeight.w600,
                                       fontFamily:
                                           GoogleFonts.openSans().fontFamily,
@@ -178,7 +178,7 @@ class _RecevedRequestListWidgetState extends State<RecevedRequestListWidget> {
                                   Text(
                                     "Description: ${property.description}",
                                     style: TextStyle(
-                                      fontSize: 16.0,
+                                      fontSize: 12.0,
                                       fontWeight: FontWeight.w600,
                                       fontFamily:
                                           GoogleFonts.openSans().fontFamily,
@@ -188,7 +188,7 @@ class _RecevedRequestListWidgetState extends State<RecevedRequestListWidget> {
                                   Text(
                                     "City: ${property.city}",
                                     style: TextStyle(
-                                      fontSize: 16.0,
+                                      fontSize: 12.0,
                                       fontWeight: FontWeight.w600,
                                       fontFamily:
                                           GoogleFonts.openSans().fontFamily,
@@ -200,9 +200,8 @@ class _RecevedRequestListWidgetState extends State<RecevedRequestListWidget> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    ElevatedButton(
+                                    OutlinedButton(
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.greenAccent,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(20.0),
@@ -218,9 +217,8 @@ class _RecevedRequestListWidgetState extends State<RecevedRequestListWidget> {
                                       ),
                                     ),
                                     const SizedBox(width: 10),
-                                    ElevatedButton(
+                                    OutlinedButton(
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.redAccent,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(20.0),
@@ -241,9 +239,8 @@ class _RecevedRequestListWidgetState extends State<RecevedRequestListWidget> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    ElevatedButton(
+                                    OutlinedButton(
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.blueAccent,
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(20.0),
@@ -267,7 +264,7 @@ class _RecevedRequestListWidgetState extends State<RecevedRequestListWidget> {
                                     "This request has been declined.",
                                     style: TextStyle(
                                       color: Colors.red,
-                                      fontSize: 16.0,
+                                      fontSize: 14.0,
                                     ),
                                   ),
                                 ),
@@ -278,7 +275,7 @@ class _RecevedRequestListWidgetState extends State<RecevedRequestListWidget> {
                                     "Terminated",
                                     style: TextStyle(
                                       color: Colors.red,
-                                      fontSize: 16.0,
+                                      fontSize: 14.0,
                                     ),
                                   ),
                                 ),

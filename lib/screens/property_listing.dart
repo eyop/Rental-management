@@ -224,7 +224,7 @@ class _PropertyListingState extends State<PropertyListing>
                       return const Text('Loading...');
                     }
                     return Text(
-                      style: TextStyle(fontSize: 12),
+                      style: const TextStyle(fontSize: 12),
                       '${snapshot.data!.docs.length}',
                     );
                   },

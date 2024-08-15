@@ -117,10 +117,6 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
       // Refresh UI after deletion
       _fetchSentRequests();
       _showSuccessAnimation();
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(builder: (context) => PropertyListing()),
-      // );
     } catch (e) {
       print('Error removing request: $e');
     }
@@ -266,7 +262,7 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
                               ),
                             ),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 OutlinedButton(
                                   style: ElevatedButton.styleFrom(
@@ -289,7 +285,7 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
                             const Padding(
                               padding: EdgeInsets.only(top: 8.0),
                               child: Text(
-                                "You are approved",
+                                "Your request was approved",
                                 style: TextStyle(
                                   color: Colors.green,
                                   fontSize: 16.0,
@@ -298,7 +294,7 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
                               ),
                             ),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 OutlinedButton(
                                   style: ElevatedButton.styleFrom(
