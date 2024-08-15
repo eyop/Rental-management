@@ -11,7 +11,10 @@ class LandingScreen extends StatelessWidget {
       body: FutureBuilder<bool>(
         future: _checkAuthState(context),
         builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data == true) {
+          print("snapshot.hasData: " + snapshot.connectionState.toString());
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return _buildLoadingScreen();
+          } else if (snapshot.hasData && snapshot.data == true) {
             // Navigate to PropertyListing if authenticated
             WidgetsBinding.instance.addPostFrameCallback((_) {
               Navigator.pushReplacement(
@@ -25,7 +28,7 @@ class LandingScreen extends StatelessWidget {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => LoginScreen()),
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
               );
             });
           } // Default return
@@ -49,7 +52,7 @@ class LandingScreen extends StatelessWidget {
           const Icon(Icons.apartment, size: 100, color: Colors.blue),
           const SizedBox(height: 20),
           const Text(
-            'Welcome to RentEase',
+            'Welcome to URP',
             style: TextStyle(
               color: Colors.blue,
               fontSize: 28,

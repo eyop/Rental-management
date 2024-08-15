@@ -499,25 +499,16 @@ class _PropertyPostState extends State<PropertyPost> {
           availability: true,
           updatedAt: DateTime.now().toIso8601String(),
           id: '',
+          propertyLocation: notifier.value
         );
-        // print("///////////////////////////////////");
-        // print("Property Type: ${propertyTypes[selected + 1]['name']}");
-        // print("Property Photos: $_imageFilesList");
-        // print("Region: $_region, City: $_city, Sub-city: $_subcity");
-        // print("Price: $_price");
-        // print("Contact: $_contact");
-        // print("Description: $_description");
-        // print("///////////////////////////////////");
 
         DocumentReference docRef = await FirebaseFirestore.instance
             .collection('properties')
             .add(property.toMap());
 
-// Set the auto-generated document ID to your PropertyModel instance
         String propertyId = docRef.id;
         property.id = propertyId;
 
-// Now you can store the updated PropertyModel instance with the document ID
         await docRef.set(property.toMap());
         // Hide loading indicator
         Navigator.of(context).pop();

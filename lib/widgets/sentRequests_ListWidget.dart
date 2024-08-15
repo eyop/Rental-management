@@ -133,10 +133,24 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
     }
 
     if (sentRequests.isEmpty) {
-      return const Center(
-        child: Text(
-          "No data found!!",
-          style: TextStyle(fontSize: 20),
+      Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              width: 300,
+              height: 300,
+              child: Image.asset(
+                'assets/images/Empty-pana.png',
+                fit: BoxFit.cover, // Adjust this as needed
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "No data found!!",
+              style: TextStyle(fontSize: 20),
+            ),
+          ],
         ),
       );
     }
@@ -164,18 +178,18 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
               margin: const EdgeInsets.only(top: 5.0, left: 5.0, right: 5.0),
               elevation: 5,
               shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                borderRadius: BorderRadius.all(Radius.circular(14.0)),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ClipRRect(
                     borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(10.0),
-                      bottomLeft: Radius.circular(10.0),
+                      topLeft: Radius.circular(14.0),
+                      bottomLeft: Radius.circular(14.0),
                     ),
                     child: SizedBox(
-                      height: 120,
+                      height: 240,
                       width: 120,
                       child: property.images == null ||
                               property.images!.isEmpty ||
@@ -195,7 +209,7 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
                             "ETB ${property.price}",
                             style: TextStyle(
                               color: Theme.of(context).primaryColor,
-                              fontSize: 18.0,
+                              fontSize: 16.0,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -205,7 +219,7 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
                               Text(
                                 "Requester: ${rentModel.name}",
                                 style: TextStyle(
-                                  fontSize: 16.0,
+                                  fontSize: 12.0,
                                   fontWeight: FontWeight.bold,
                                   fontFamily: GoogleFonts.openSans().fontFamily,
                                 ),
@@ -214,7 +228,7 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
                               Text(
                                 "Price: ${property.price}",
                                 style: TextStyle(
-                                  fontSize: 16.0,
+                                  fontSize: 12.0,
                                   fontWeight: FontWeight.bold,
                                   fontFamily: GoogleFonts.openSans().fontFamily,
                                 ),
@@ -223,7 +237,7 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
                               Text(
                                 "City: ${property.city}",
                                 style: TextStyle(
-                                  fontSize: 14.0,
+                                  fontSize: 12.0,
                                   fontWeight: FontWeight.w600,
                                   fontFamily: GoogleFonts.openSans().fontFamily,
                                 ),
@@ -232,7 +246,7 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
                               Text(
                                 "Description: ${property.description}",
                                 style: TextStyle(
-                                  fontSize: 14.0,
+                                  fontSize: 12.0,
                                   fontWeight: FontWeight.w600,
                                   fontFamily: GoogleFonts.openSans().fontFamily,
                                 ),
@@ -246,7 +260,7 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
                                 "Waiting for approval",
                                 style: TextStyle(
                                   color: Colors.orange,
-                                  fontSize: 16.0,
+                                  fontSize: 12.0,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -254,9 +268,8 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                ElevatedButton(
+                                OutlinedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.redAccent,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(20.0),
                                     ),
@@ -266,7 +279,7 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
                                   },
                                   child: const Text(
                                     "Cancel Request",
-                                    style: TextStyle(color: Colors.black),
+                                    style: TextStyle(color: Colors.red),
                                   ),
                                 ),
                               ],
@@ -287,9 +300,8 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                ElevatedButton(
+                                OutlinedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blueAccent,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(20.0),
                                     ),
@@ -300,7 +312,7 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
                                   },
                                   child: const Text(
                                     "Terminate",
-                                    style: TextStyle(color: Colors.black),
+                                    style: TextStyle(color: Colors.red),
                                   ),
                                 ),
                               ],

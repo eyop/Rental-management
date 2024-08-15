@@ -28,10 +28,11 @@ class AuthenticationProvider extends ChangeNotifier {
 
   // check authentication state
   Future<bool> checkAuthenticationState() async {
+    print("Entering: checkAuthenticationState");
     bool isSignedIn = false;
-    await Future.delayed(const Duration(seconds: 2));
-
+    print("Checking current user on Firebase Auth...");
     if (_auth.currentUser != null) {
+      print("User found, fetching user ID...");
       _uid = _auth.currentUser!.uid;
       // get user data from firestore
       await getUserDataFromFireStore();
@@ -43,14 +44,17 @@ class AuthenticationProvider extends ChangeNotifier {
 
       isSignedIn = true;
     } else {
+      print("No user found on Firebase Auth.");
       isSignedIn = false;
     }
 
+    print("Exiting: checkAuthenticationState");
     return isSignedIn;
   }
 
   // login with email and password
   Future<void> login(String email, String password) async {
+    print("Entering: login");
     _isLoading = true;
     notifyListeners();
 
@@ -63,18 +67,23 @@ class AuthenticationProvider extends ChangeNotifier {
       _uid = _auth.currentUser!.uid;
       _isLoading = false;
       _isSuccessful = true;
+      print("Login successful, user ID: $_uid");
       notifyListeners();
     } catch (e) {
       _isLoading = false;
       _isSuccessful = false;
+      print("Login failed: $e");
       notifyListeners();
       throw e;
     }
+
+    print("Exiting: login");
   }
 
   // signup with email and password
   Future<void> signup(String username, String email, String password,
       String phoneNumber) async {
+    print("Entering: signup");
     _isLoading = true;
     notifyListeners();
 
@@ -107,53 +116,72 @@ class AuthenticationProvider extends ChangeNotifier {
       notifyListeners();
       throw e;
     }
+
+    print("Exiting: signup");
   }
 
   // Method to send password reset email
   Future<void> resetPassword(String email) async {
+    print("Entering: resetPassword");
     try {
       await _auth.sendPasswordResetEmail(email: email);
+      print("Password reset email sent to: $email");
     } catch (e) {
       throw e;
     }
+
+    print("Exiting: resetPassword");
   }
 
   // get user data from firestore
   Future<void> getUserDataFromFireStore() async {
+    print("Entering: getUserDataFromFireStore");
     DocumentSnapshot documentSnapshot =
         await _firestore.collection('users').doc(_uid).get();
     _userModel =
         UserModel.fromMap(documentSnapshot.data() as Map<String, dynamic>);
     notifyListeners();
+
+    print("Exiting: getUserDataFromFireStore");
   }
 
   // save user data to shared preferences
   Future<void> saveUserDataToSharedPreferences() async {
+    print("Entering: saveUserDataToSharedPreferences");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.setString(
         'userModel', jsonEncode(_userModel!.toMap()));
+
+    print("Exiting: saveUserDataToSharedPreferences");
   }
 
   // get data from shared preferences
   Future<void> getUserDataFromSharedPreferences() async {
+    print("Entering: getUserDataFromSharedPreferences");
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String userModelString = sharedPreferences.getString('userModel') ?? '';
     _userModel = UserModel.fromMap(jsonDecode(userModelString));
     _uid = _userModel!.uid;
     notifyListeners();
+
+    print("Exiting: getUserDataFromSharedPreferences");
   }
 
   // logout
   Future<void> logout() async {
+    print("Entering: logout");
     await _auth.signOut();
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.clear();
     notifyListeners();
     //Navigator.of(context).pushReplacementNamed('/');
+
+    print("Exiting: logout");
   }
 
   // Fetch properties from Firestore
   Future<List<PropertyModel>> fetchProperties() async {
+    print("Entering: fetchProperties");
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('properties')
@@ -163,6 +191,7 @@ class AuthenticationProvider extends ChangeNotifier {
           .map((doc) =>
               PropertyModel.fromFirestore(doc.data() as Map<String, dynamic>))
           .toList();
+      print("Exiting: fetchProperties");
       return properties;
     } catch (e) {
       print('Error fetching properties: $e');
@@ -172,16 +201,17 @@ class AuthenticationProvider extends ChangeNotifier {
 
   // Fetch requested properties
   Future<List<RentModel>> fetchRequestProps() async {
+    print("Entering: fetchRequestProps");
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('rental_requests')
-          .where('ownerId',
-              isEqualTo: _uid) // Assuming _uid is set during authentication
+          .where('ownerId', isEqualTo: _uid) // Assuming _uid is set during authentication
           .get();
       List<RentModel> requestedProps = querySnapshot.docs
           .map((doc) => RentModel.fromFirestore(doc))
           .toList();
 
+      print("Exiting: fetchRequestProps");
       return requestedProps;
     } catch (e) {
       print('Error fetching requested properties: $e');
@@ -191,15 +221,15 @@ class AuthenticationProvider extends ChangeNotifier {
 
   // Fetch sent requests where current user is the requester
   Future<List<RentModel>> fetchSentRequests() async {
+    print("Entering: fetchSentRequests");
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('rental_requests')
-          .where('userId',
-              isEqualTo: _uid) // Assuming _uid is set during authentication
+          .collection('rental_requests')// Assuming _uid is set during authentication
           .get();
       List<RentModel> sentRequests = querySnapshot.docs
           .map((doc) => RentModel.fromFirestore(doc))
           .toList();
+      print("Exiting: fetchSentRequests");
       return sentRequests;
     } catch (e) {
       print('Error fetching sent requests: $e');
@@ -209,16 +239,18 @@ class AuthenticationProvider extends ChangeNotifier {
 
   // Check if the current user can request rent for a property
   Future<bool> canRequestRent(String propertyId) async {
+    print("Entering: canRequestRent");
     try {
       final userModel = _userModel;
       if (userModel != null) {
         var querySnapshot = await FirebaseFirestore.instance
             .collection('rental_requests')
-            .where('ownerId', isEqualTo: propertyId)
             .get();
 
+        print("Exiting: canRequestRent");
         return querySnapshot.docs.isEmpty;
       }
+      print("Exiting: canRequestRent (user not found)");
       return false;
     } catch (e) {
       print('Error checking if user can request rent: $e');
@@ -234,6 +266,7 @@ class AuthenticationProvider extends ChangeNotifier {
       required String propertyId,
       required String status}) async {
     try {
+      print("Entering: createRentalRequest");
       final userModel = _userModel;
       var request = await FirebaseFirestore.instance
           .collection('rental_requests')
@@ -262,6 +295,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
   // Cancel user's existing request to rent the property
   Future<void> cancelRequestToRentProperty(String propertyId) async {
+    print("Entering: cancelRequestToRentProperty");
     try {
       await FirebaseFirestore.instance
           .collection('rental_requests')
@@ -274,6 +308,7 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   Future<String> uploadImage(File imageFile) async {
+    print("Entering: canRequestRent");
     try {
       String imageName = path.basename(imageFile.path);
       Reference storageReference =

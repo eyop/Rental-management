@@ -10,6 +10,7 @@ import 'package:rental_management/screens/privacyPolicy_Screen.dart';
 import 'package:rental_management/screens/profileScreen.dart';
 import 'package:rental_management/screens/property_post.dart';
 import 'package:rental_management/widgets/property_ListWidget.dart';
+import 'package:rental_management/widgets/property_mapWidget.dart';
 import 'package:rental_management/widgets/recevedRequest_ListWidget.dart';
 import 'package:rental_management/widgets/sentRequests_ListWidget.dart';
 
@@ -39,7 +40,8 @@ class _PropertyListingState extends State<PropertyListing>
   void initState() {
     super.initState();
     uid = context.read<AuthenticationProvider>().uid;
-    _tabController = TabController(length: 3, vsync: this);
+    print("uid: " + uid!);
+    _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(_handleTabChange);
   }
 
@@ -162,7 +164,7 @@ class _PropertyListingState extends State<PropertyListing>
                   Icons.list,
                   color: Colors.white,
                 ),
-                text: "Properties",
+                text: "Listing",
               ),
               Tab(
                 icon: Icon(
@@ -176,11 +178,11 @@ class _PropertyListingState extends State<PropertyListing>
                   Icons.send,
                   color: Colors.white,
                 ),
-                text: "Sent Requests",
+                text: "Sent",
               ),
               Tab(
                 icon: Icon(
-                  Icons.send,
+                  Icons.map,
                   color: Colors.white,
                 ),
                 text: "Map",
@@ -192,14 +194,15 @@ class _PropertyListingState extends State<PropertyListing>
           child: ListView(
             padding: EdgeInsets.zero,
             children: <Widget>[
-              const DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.blueGrey,
+              DrawerHeader(
+                decoration: const BoxDecoration(
+                  color: Color.fromARGB(255, 186, 199, 206),
                 ),
-                child: Text(
-                  'Welcome',
-                  style: TextStyle(
-                      color: Colors.white, fontSize: 24, letterSpacing: 1.5),
+                margin: const EdgeInsets.all(0.0),
+                padding: const EdgeInsets.all(0.0),
+                child: FittedBox(
+                  fit: BoxFit.fill,
+                  child: Image.asset('assets/images/urp_image.jpeg'),
                 ),
               ),
               ListTile(
@@ -299,7 +302,7 @@ class _PropertyListingState extends State<PropertyListing>
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const AboutScreen()),
+                        builder: (context) => AboutScreen()),
                   );
                 },
               ),
@@ -339,6 +342,9 @@ class _PropertyListingState extends State<PropertyListing>
                             });
                           },
                           decoration: InputDecoration(
+                            hintStyle: const TextStyle(
+                              color: Colors.black,
+                            ),
                             hintText: 'Search...',
                             prefixIcon: const Icon(Icons.search),
                             border: OutlineInputBorder(
@@ -346,7 +352,7 @@ class _PropertyListingState extends State<PropertyListing>
                               borderSide: BorderSide.none,
                             ),
                             filled: true,
-                            contentPadding: EdgeInsets.all(0),
+                            contentPadding: const EdgeInsets.all(0),
                           ),
                         ),
                       ),
@@ -404,6 +410,10 @@ class _PropertyListingState extends State<PropertyListing>
             RefreshIndicator(
               onRefresh: _refreshData,
               child: SentRequestsListWidget(sentRequests1: sentRequests1),
+            ),
+            RefreshIndicator(
+              onRefresh: _refreshData,
+              child: PropertyMapWidget(properties: propertyRentList),
             ),
           ],
         ),

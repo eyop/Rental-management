@@ -77,10 +77,24 @@ class _RecevedRequestListWidgetState extends State<RecevedRequestListWidget> {
   @override
   Widget build(BuildContext context) {
     return requestedProps.isEmpty
-        ? const Center(
-            child: Text(
-              "No data found!!",
-              style: TextStyle(fontSize: 20),
+        ? Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(
+                  width: 300,
+                  height: 300,
+                  child: Image.asset(
+                    'assets/images/Empty-pana.png',
+                    fit: BoxFit.cover, // Adjust this as needed
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  "No data found!!",
+                  style: TextStyle(fontSize: 20),
+                ),
+              ],
             ),
           )
         : ListView.separated(
