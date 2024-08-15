@@ -6,6 +6,8 @@ import 'landing_screen.dart';
 import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -20,15 +22,15 @@ class _LoginScreenState extends State<LoginScreen> {
           .resetPassword(email);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Password reset email sent. Check your inbox.'),
-          backgroundColor: Colors.green,
+          content: const Text('Password reset email sent. Check your inbox.'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to send reset email: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
     }
@@ -36,66 +38,62 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.blue.shade900,
       body: Center(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 Icons.lock_open,
                 size: 100,
-                color: Colors.white,
+                color: theme.colorScheme.primary,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Text(
                 'Login',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
+                style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
                   labelText: 'Email',
-                  prefixIcon: Icon(Icons.email, color: Colors.white),
-                  labelStyle: TextStyle(color: Colors.white),
+                  prefixIcon: const Icon(Icons.email),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide: BorderSide(color: theme.colorScheme.outline),
+                    borderRadius: BorderRadius.circular(12.0), // Decreased radius
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide: BorderSide(color: theme.colorScheme.primary),
+                    borderRadius: BorderRadius.circular(12.0), // Decreased radius
                   ),
                 ),
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: theme.colorScheme.onSurface),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 30),
               TextField(
                 controller: _passwordController,
                 decoration: InputDecoration(
                   labelText: 'Password',
-                  prefixIcon: Icon(Icons.lock, color: Colors.white),
-                  labelStyle: TextStyle(color: Colors.white),
+                  prefixIcon: const Icon(Icons.lock),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide: BorderSide(color: theme.colorScheme.outline),
+                    borderRadius: BorderRadius.circular(12.0), // Decreased radius
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white),
-                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide: BorderSide(color: theme.colorScheme.primary),
+                    borderRadius: BorderRadius.circular(12.0), // Decreased radius
                   ),
                 ),
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: theme.colorScheme.onBackground),
                 obscureText: true,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () async {
                   String email = _emailController.text.trim();
@@ -123,44 +121,44 @@ class _LoginScreenState extends State<LoginScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(errorMessage),
-                        backgroundColor: Colors.red,
+                        backgroundColor: theme.colorScheme.error,
                       ),
                     );
                   } catch (e) {
                     print('Unexpected error: $e');
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('An unexpected error occurred.'),
-                        backgroundColor: Colors.red,
+                        content: const Text('An unexpected error occurred.'),
+                        backgroundColor: theme.colorScheme.error,
                       ),
                     );
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  foregroundColor: theme.colorScheme.primary, // Use theme color
                 ),
                 child: Text(
                   'Login',
                   style: TextStyle(
-                    color: Colors.blue.shade900,
+                    color: theme.colorScheme.onPrimary,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               TextButton(
                 onPressed: () {
                   _resetPassword(context, _emailController.text.trim());
                 },
                 style: TextButton.styleFrom(
-                  foregroundColor: Colors.white,
+                  foregroundColor: theme.colorScheme.primary, // Use theme color
                 ),
-                child: Text('Forgot Password?'),
+                child: const Text('Forgot Password?'),
               ),
               TextButton(
                 onPressed: () {
@@ -170,9 +168,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   );
                 },
                 style: TextButton.styleFrom(
-                  foregroundColor: Colors.white,
+                  foregroundColor: theme.colorScheme.primary, // Use theme color
                 ),
-                child: Text('Sign Up'),
+                child: const Text('Sign Up'),
               ),
             ],
           ),

@@ -7,6 +7,9 @@ import 'package:path/path.dart' as Path;
 import 'package:provider/provider.dart';
 import 'package:rental_management/providers/authentication_provider.dart';
 import '../models/property_model.dart';
+import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
+import 'package:flutter_osm_interface/src/types/geo_point.dart' as geo_point;
 
 class PropertyPost extends StatefulWidget {
   static const String routeName = '/property-post';
@@ -34,6 +37,7 @@ class _PropertyPostState extends State<PropertyPost> {
   String _description = "";
   String _contact = "";
   double _price = 0.0;
+  ValueNotifier<geo_point.GeoPoint?> notifier = ValueNotifier(null);
 
   int selected = 0;
   final List<String> _imageFilesList = [];
@@ -45,7 +49,7 @@ class _PropertyPostState extends State<PropertyPost> {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         titleSpacing: 0,
-        title: const Text("Rent Property"),
+        title: const Text("Rent a Property"),
       ),
       body: Column(
         children: <Widget>[
@@ -71,6 +75,8 @@ class _PropertyPostState extends State<PropertyPost> {
                       _buildContactDetailsWidget(),
                       _buildLabel("OTHER DETAILS"),
                       _buildDescription(),
+                      _buildLabel("PEROPERTY LOCATION"),
+                      _buildLocationPicker(),
                     ],
                   ),
                 ],
@@ -113,6 +119,61 @@ class _PropertyPostState extends State<PropertyPost> {
     );
   }
 
+  Widget _buildLocationPicker() {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 20.0),
+        child: Column(
+          children: [
+            ValueListenableBuilder<geo_point.GeoPoint?>(
+              valueListenable: notifier,
+              builder: (context, value, child) {
+                return Text(
+                  value != null
+                      ? "Selected location: ${value.latitude}, ${value.longitude}"
+                      : "No location selected",
+                  style: const TextStyle(fontSize: 16.0),
+                );
+              },
+            ),
+            const SizedBox(height: 20.0), // Spacer
+            OutlinedButton.icon(
+              onPressed: () async {
+                var p = await showSimplePickerLocation(
+                  context: context,
+                  isDismissible: true,
+                  title: "Pick Item Location",
+                  textConfirmPicker: "Okay",
+                  zoomOption: const ZoomOption(
+                    initZoom: 8,
+                  ),
+                  initPosition: geo_point.GeoPoint(
+                    latitude: 9.0192,
+                    longitude: 38.7525,
+                  ),
+                  radius: 8.0,
+                );
+                if (p != null) {
+                  notifier.value = p;
+                }
+              },
+              icon: const Icon(Icons.location_on),
+              label: const Text(
+                "Select location",
+                style: TextStyle(fontSize: 16.0),
+              ),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50), // Full width
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildDescription() {
     return Container(
       color: Colors.white,
@@ -145,7 +206,7 @@ class _PropertyPostState extends State<PropertyPost> {
       padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 20.0),
       child: Text(
         label,
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.black,
           fontSize: 16.0,
           fontWeight: FontWeight.bold,

@@ -8,7 +8,9 @@ Color unselectedIconColor = Colors.grey[500]!;
 class CustomTheme {
   static ThemeData get themeData {
     return ThemeData(
+      useMaterial3: false,
       primaryColor: Colors.blue.shade800,
+      secondaryHeaderColor: Colors.white,
       hintColor: Colors.blueAccent,
       scaffoldBackgroundColor: Colors.white,
       fontFamily: 'Roboto',

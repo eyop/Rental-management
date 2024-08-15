@@ -1,3 +1,5 @@
+import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+
 class PropertyModel {
   String id;
   final bool availability;
@@ -11,6 +13,7 @@ class PropertyModel {
   final String updatedAt;
   final String userId;
   final String? propertyType;
+  final GeoPoint propertyLocation;
 
   Map<String, dynamic>? details;
 
@@ -28,7 +31,9 @@ class PropertyModel {
     required this.propertyType,
     required this.contact,
     required this.updatedAt,
-  });
+    GeoPoint? propertyLocation,
+  }) : propertyLocation = propertyLocation ??
+            GeoPoint(latitude: 9.03, longitude: 38.74); // Addis Ababa default
 
   factory PropertyModel.fromFirestore(Map<String, dynamic> data) {
     return PropertyModel(
@@ -45,6 +50,12 @@ class PropertyModel {
       userId: data['userId'] ?? '',
       propertyType: data['propertyType'] ?? '',
       details: {},
+      propertyLocation: data['propertyLocation'] != null
+          ? GeoPoint(
+              latitude: data['propertyLocation']['latitude'],
+              longitude: data['propertyLocation']['longitude'],
+            )
+          : GeoPoint(latitude: 9.03, longitude: 38.74), // Addis Ababa default
     );
   }
 
@@ -63,34 +74,10 @@ class PropertyModel {
       'userId': userId,
       'propertyType': propertyType,
       'details': details,
+      'propertyLocation': {
+        'latitude': propertyLocation.latitude,
+        'longitude': propertyLocation.longitude,
+      },
     };
   }
-
-  // factory PropertyModel.fromMap(Map<String, dynamic> value)
-  // // factory PropertyModel.fromJson(Map<String, dynamic> value)
-  // {
-  //   var images = [];
-  //   try {
-  //     final List<dynamic>? data = value["image"];
-  //     if (data != null) {
-  //       images = List<String>.from(data);
-  //     }
-  //   } catch (error) {
-  //     images = [];
-  //   }
-
-  //   return PropertyModel(
-  //     id: value["id"],
-  //     images: images as List<String>,
-  //     price: value["price"],
-  //     details: value['details'],
-  //     region: value['region'],
-  //     city: value['city'],
-  //     subcity: value['subcity'],
-  //     description: value["description"],
-  //     propertyType: value["propertyType"],
-  //     contact: value["contact"],
-  //     updatedAt: value["updatedAt"],
-  //   );
-  // }
 }

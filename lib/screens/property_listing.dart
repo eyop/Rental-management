@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:rental_management/models/property_model.dart';
 import 'package:rental_management/models/rent_model.dart';
@@ -152,14 +153,38 @@ class _PropertyListingState extends State<PropertyListing>
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          title: const Text("RentEase"),
+          title: const Text("E-Kiray"),
           bottom: TabBar(
             controller: _tabController,
-            labelColor: Colors.blueAccent,
             tabs: const [
-              Tab(icon: Icon(Icons.list), text: "Properties"),
-              Tab(icon: Icon(Icons.request_page), text: "Incoming Requests"),
-              Tab(icon: Icon(Icons.send), text: "Sent Requests"),
+              Tab(
+                icon: Icon(
+                  Icons.list,
+                  color: Colors.white,
+                ),
+                text: "Properties",
+              ),
+              Tab(
+                icon: Icon(
+                  Icons.request_page,
+                  color: Colors.white,
+                ),
+                text: "Incoming Requests",
+              ),
+              Tab(
+                icon: Icon(
+                  Icons.send,
+                  color: Colors.white,
+                ),
+                text: "Sent Requests",
+              ),
+              Tab(
+                icon: Icon(
+                  Icons.send,
+                  color: Colors.white,
+                ),
+                text: "Map",
+              ),
             ],
           ),
         ),
@@ -180,7 +205,7 @@ class _PropertyListingState extends State<PropertyListing>
               ListTile(
                 leading: const Icon(Icons.cabin),
                 title: const Text(
-                  'Properties Posted',
+                  'PropertiesPosted',
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -195,7 +220,10 @@ class _PropertyListingState extends State<PropertyListing>
                     if (!snapshot.hasData) {
                       return const Text('Loading...');
                     }
-                    return Text('${snapshot.data!.docs.length}');
+                    return Text(
+                      style: TextStyle(fontSize: 12),
+                      '${snapshot.data!.docs.length}',
+                    );
                   },
                 ),
               ),
@@ -227,9 +255,10 @@ class _PropertyListingState extends State<PropertyListing>
                 title: const Text(
                   'Profile',
                   style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1,
+                  ),
                 ),
                 onTap: () {
                   Navigator.push(
@@ -243,15 +272,16 @@ class _PropertyListingState extends State<PropertyListing>
                 title: const Text(
                   'Privacy Policy',
                   style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1,
+                  ),
                 ),
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => PrivacyPolicyScreen()),
+                        builder: (context) => const PrivacyPolicyScreen()),
                   );
                 },
               ),
@@ -260,14 +290,16 @@ class _PropertyListingState extends State<PropertyListing>
                 title: const Text(
                   'About',
                   style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1),
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1,
+                  ),
                 ),
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AboutScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const AboutScreen()),
                   );
                 },
               ),
@@ -375,15 +407,16 @@ class _PropertyListingState extends State<PropertyListing>
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.deepPurpleAccent,
-          foregroundColor: Colors.white,
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const PropertyPost()),
-            );
-          },
-          child: const Icon(Icons.add),
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: FloatingActionButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const PropertyPost()),
+              );
+            },
+            child: const Icon(Icons.add),
+          ),
         ),
       ),
     );

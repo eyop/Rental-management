@@ -44,7 +44,7 @@ class PropertyListWidget extends StatelessWidget {
                       const EdgeInsets.only(top: 5.0, left: 5.0, right: 5.0),
                   elevation: 5,
                   shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
                   ),
                   child: SizedBox(
                     height: 180, // Ensure enough height for all elements
@@ -52,12 +52,12 @@ class PropertyListWidget extends StatelessWidget {
                       children: [
                         ClipRRect(
                           borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(10.0),
-                            bottomLeft: Radius.circular(10.0),
+                            topLeft: Radius.circular(12.0),
+                            bottomLeft: Radius.circular(12.0),
                           ),
                           child: SizedBox(
-                            height: 150,
-                            width: 120,
+                            height: 180,
+                            width: 130,
                             child: rentModel.images == null ||
                                     rentModel.images!.isEmpty ||
                                     rentModel.images![0].isEmpty
@@ -86,7 +86,7 @@ class PropertyListWidget extends StatelessWidget {
                                   "Posted on  : $postedDate",
                                   style: TextStyle(
                                     color: Colors.grey[600],
-                                    fontSize: 14.0,
+                                    fontSize: 12.0,
                                     fontWeight: FontWeight.w600,
                                     fontFamily:
                                         GoogleFonts.openSans().fontFamily,
@@ -99,7 +99,7 @@ class PropertyListWidget extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     color: Colors.grey[700],
-                                    fontSize: 16.0,
+                                    fontSize: 12.0,
                                     fontWeight: FontWeight.w600,
                                     fontFamily:
                                         GoogleFonts.openSans().fontFamily,
@@ -112,7 +112,7 @@ class PropertyListWidget extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     color: Colors.grey[700],
-                                    fontSize: 16.0,
+                                    fontSize: 12.0,
                                     fontWeight: FontWeight.w600,
                                     fontFamily:
                                         GoogleFonts.openSans().fontFamily,
@@ -126,7 +126,7 @@ class PropertyListWidget extends StatelessWidget {
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       color: Colors.grey[700],
-                                      fontSize: 14.0,
+                                      fontSize: 12.0,
                                       fontWeight: FontWeight.w600,
                                       fontFamily:
                                           GoogleFonts.openSans().fontFamily,
@@ -163,7 +163,7 @@ class PropertyListWidget extends StatelessWidget {
 Widget fetchImageWithPlaceHolder(String imageUrl) => imageUrl.isNotEmpty
     ? Image.network(
         imageUrl,
-        fit: BoxFit.cover,
+        fit: BoxFit.fill,
       )
     : placeholderAssetWidget();
 

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -210,7 +211,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                   ),
                 );
               },
-              child: Icon(Icons.edit),
+              child: const Icon(Icons.edit),
             )
           : null,
     );
@@ -273,18 +274,11 @@ class _PropertyDetailsState extends State<PropertyDetails> {
       titleSpacing: 0.0,
       expandedHeight: MediaQuery.of(context).size.height * 0.35,
       flexibleSpace: FlexibleSpaceBar(
+        collapseMode: CollapseMode.pin,
         title: Text(
           "ETB. ${widget.rentModel.price}", // Display property price in app bar
           style: const TextStyle(
-            color: Colors.blueAccent,
             fontWeight: FontWeight.w600,
-            shadows: [
-              Shadow(
-                offset: Offset(0, 1),
-                blurRadius: 3.0,
-                color: Colors.black,
-              ),
-            ],
           ),
         ),
         background: Hero(
@@ -430,7 +424,14 @@ class _PropertyDetailsState extends State<PropertyDetails> {
         _propertyAddressView("Subcity", widget.rentModel.subcity),
         _propertyAddressView("Contact", widget.rentModel.contact),
         _propertyAddressView("Description", widget.rentModel.description),
+        _propertyEmptyItem()
       ]),
+    );
+  }
+
+  Widget _propertyEmptyItem() {
+    return const SizedBox(
+      height: 400,
     );
   }
 
