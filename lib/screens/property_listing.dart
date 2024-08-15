@@ -153,7 +153,7 @@ class _PropertyListingState extends State<PropertyListing>
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          title: const Text("E-Kiray"),
+          title: const Text("URP"),
           bottom: TabBar(
             controller: _tabController,
             tabs: const [

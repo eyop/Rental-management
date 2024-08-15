@@ -90,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(12.0), // Decreased radius
                   ),
                 ),
-                style: TextStyle(color: theme.colorScheme.onBackground),
+                style: TextStyle(color: theme.colorScheme.onSurface),
                 obscureText: true,
               ),
               const SizedBox(height: 30),
