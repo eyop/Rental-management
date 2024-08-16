@@ -84,7 +84,7 @@ class _AboutScreenState extends State<AboutScreen> {
                         'What are the objectives of the Universal Rental Portal System?\n'
                         '• The objectives of the system include streamlining rental processes, increasing accessibility, enhancing transparency, ensuring secure transactions, and improving customer satisfaction.\n\n'
                         'What are the development tools used for the Universal Rental Portal System?\n'
-                        '• The development tools used for the system include Javascript and Flutter with Dart for the mobile app, and MySQL for the database.',
+                        '• The development tools used for the system include Javascript and Flutter with Dart for the mobile app, and Firestore Database  for the database.',
                         style: Theme.of(context).textTheme.bodyMedium,
                         textAlign: TextAlign.justify,
                       ),
