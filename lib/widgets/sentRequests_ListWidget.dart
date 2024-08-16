@@ -129,7 +129,7 @@ class _SentRequestsListWidgetState extends State<SentRequestsListWidget> {
     }
 
     if (sentRequests.isEmpty) {
-      Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
