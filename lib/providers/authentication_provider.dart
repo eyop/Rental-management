@@ -214,7 +214,8 @@ class AuthenticationProvider extends ChangeNotifier {
           .map((doc) => RentModel.fromFirestore(doc))
           .toList();
 
-      // print(requestedProps.length);
+      print("Exiting: fetchRequestProps");
+
       return requestedProps;
     } catch (e) {
       print('Error fetching requested properties: $e');
