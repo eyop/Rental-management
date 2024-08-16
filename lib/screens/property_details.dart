@@ -138,6 +138,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
         .collection('rental_requests')
         .doc(widget.rentModel.id)
         .get();
+
     if (!request.exists)
     // if (!requestExists.isNotEmpty)
     {

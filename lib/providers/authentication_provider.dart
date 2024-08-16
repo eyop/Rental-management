@@ -235,7 +235,8 @@ class AuthenticationProvider extends ChangeNotifier {
       List<RentModel> sentRequests = querySnapshot.docs
           .map((doc) => RentModel.fromFirestore(doc))
           .toList();
-      print("Exiting: fetchSentRequests");
+      print("/////////////////////////////////////");
+      print(sentRequests);
       return sentRequests;
     } catch (e) {
       print('Error fetching sent requests: $e');
@@ -273,6 +274,7 @@ class AuthenticationProvider extends ChangeNotifier {
       required String propertyId,
       required String status}) async {
     try {
+      print("/////////////////////////////////////////");
       print("Entering: createRentalRequest");
       final userModel = _userModel;
       var request = await FirebaseFirestore.instance
