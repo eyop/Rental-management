@@ -206,7 +206,7 @@ class AuthenticationProvider extends ChangeNotifier {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('rental_requests')
           .where(
-            'userId',
+            'ownerId',
             isEqualTo: _uid,
           ) // Assuming _uid is set during authentication
           .get();
@@ -214,7 +214,7 @@ class AuthenticationProvider extends ChangeNotifier {
           .map((doc) => RentModel.fromFirestore(doc))
           .toList();
 
-      print("Exiting: fetchRequestProps");
+      // print(requestedProps.length);
       return requestedProps;
     } catch (e) {
       print('Error fetching requested properties: $e');
@@ -250,6 +250,7 @@ class AuthenticationProvider extends ChangeNotifier {
       if (userModel != null) {
         var querySnapshot = await FirebaseFirestore.instance
             .collection('rental_requests')
+            .where('ownerId', isEqualTo: propertyId)
             .get();
 
         print("Exiting: canRequestRent");
